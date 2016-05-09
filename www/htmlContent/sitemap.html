@@ -1,0 +1,136 @@
+	<div id="menu-index">
+		<div class="scroller"><!-- this is for emulating position fixed of the nav -->
+			<div class="scroller-inner">
+
+				<div class="content clearfix">
+
+					<tour 
+						step="currentStep">				
+							<ul id="primaryNav" class="unstyled tc" style="position:relative;">
+								<!--
+								<li id="home">
+									<a href="javascript:;" class="embossed-heavy" data-ng-click="openPage('menu')" rel="home"></a>
+								</li> -->
+								<span 
+									style=""
+									on-proceed="tourStepComplete()"
+									tourtip-container-element="#primaryNav"
+									tourtip-step="0"
+									tourtip-backDrop = "true"
+									tourtip-placement="top"
+									tourtip-next-label="Continue"
+									tourtip-offset-vertical="30"
+    								tourtip-offset-horizontal="500"
+									tourtip="Click / Tap on a button below to view the available documents from that department/contractor."></span>
+								<ul class="unstyled tc">
+									<li bindonce data-ng-repeat="path in networkPaths track by $index">
+										<a 
+											href="javascript:;" 
+											class="embossed-heavy menu-start FiraFont" 
+											data-path="{{path.Value}}" 
+											bo-text="path.Name"
+											data-ng-click="openSite( $event )"></a>
+									</li>
+									<li data-ng-if="networkPaths.length == 0">
+										<div class="alert alert-block alert-info tc FiraFont">
+											<p style="font-size:2em;line-height:2.5em;">
+												It appears the network location is not available or has been misconfigured.<br />Please contact the System Administrator.
+											</p>
+											<br />
+											<a 
+												href="javascript:;"
+												style="display:inline-block;border-radius:999px;"
+												class="btn btn-large macdaddy-rounded" 
+												data-ng-click="openPage('settings')" data-title="Settings">Configure</a>
+											<br /><br />
+										</div>
+									</li>
+								</ul>
+							</ul>
+					</tour>
+					
+					<div class="row tc">
+						<br />
+						<br />
+						<hr />
+						<br />
+						<br />
+					</div>
+					
+					<!-- [FOOTER] -->
+					<div class="row tc" data-ng-switch on="renderPath[ 0 ]">
+
+						<div class="columns sixteen">
+
+							<!-- FILE EXPLORER -->
+							<div data-ng-switch-when="browse">
+
+								<div data-ng-switch on="renderPath[ 1 ]">
+
+									<!-- PRINT PREVIEW -->
+									<div data-ng-switch-when="printPreview"></div>
+
+									<!-- DEFAULT -->
+									<div data-ng-switch-default>
+						
+										<div class="phola-main-navigation">
+											<ul class="unstyled tc">
+												<li bindonce data-ng-repeat="path in networkGlobalPaths track by $index">
+													<a 
+														href="javascript:;" 
+														class="embossed-heavy menu-start FiraFont" 
+														style="background-colour:#E64444;border:1px solid #A51515;"
+														data-path="{{path.Value}}" 
+														bo-text="path.Name"
+														data-ng-click="openSite( $event )"></a>
+												</li>
+												<li data-ng-if="networkGlobalPaths.length == 0"></li>
+											</ul>
+										</div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+							<!-- SETTINGS -->
+							<div data-ng-cloak class="anim8-page main" data-ng-switch-when="settings"></div>
+
+							<!-- DEFAULT -->
+							<div data-ng-switch-default>
+				
+								<div class="phola-main-navigation">
+									<ul class="unstyled tc grid-5-equalHeight-center-middle-spaceBetween">
+										<li class="col" bindonce data-ng-repeat="path in networkGlobalPaths track by $index">
+											<a 
+												href="javascript:;" 
+												class="embossed-heavy menu-start FiraFont" 
+												style="background-color:#E64444;border:1px solid #A51515;padding:1em 2em;"
+												data-path="{{path.Value}}" 
+												bo-text="path.Name"
+												data-ng-click="openSite( $event )"></a>
+										</li>
+										<li data-ng-if="networkGlobalPaths.length == 0"></li>
+										<li class="col">
+											<a 
+												href="javascript:;"
+												data-ng-click="openPage( 'report' )"
+												class="embossed-heavy menu-start FiraFont" 
+												style="background-color:#E64444;border:1px solid #A51515;padding:1em 2em;"
+												>Training & Licenses</a>
+										</li>
+									</ul>
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+					<!-- [/FOOTER] -->
+
+				</div>
+			</div><!-- /scroller-inner -->
+    	</div><!-- /scroller -->
+	</div>

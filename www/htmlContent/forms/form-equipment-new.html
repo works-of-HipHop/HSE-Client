@@ -1,0 +1,68 @@
+							<form method="post" id="formEquipmentNew" name="formEquipmentNew" enctype="multipart/form-data" class="prForm clearfix" novalidate="novalidate" data-ng-submit="save()">
+								<h4 class="assistive-text">Edit Equipment Form</h4>
+								<br />
+								<div 
+									class="alert alert-block"
+									data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+									data-ng-show="formFeedBack">
+										<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+								</div>
+								
+								<table class="table footable">
+									<tbody>
+										
+										<tr>
+											<td colspan="1">
+												<label class="FiraFont uppercase" for="Name">Name <small>(required)</small></label>
+												<input 
+													type="text"
+													class="input-medium"
+													style="height:30px;"
+													data-ng-model="new_equipment.Name"
+													id="Name" name="Name" 
+													required="required" placeholder="Name" />
+											</td>
+											<td colspan="1">
+												<label class="FiraFont uppercase" for="PTODateLength">PTO Date Length <small>(required)</small></label>
+												<input 
+													type="number"
+													class="input-medium"
+													style="height:30px;"
+													data-ng-model="new_equipment.PTODateLength"
+													id="PTODateLength" name="PTODateLength" 
+													required="required" placeholder="PTO Date" min="7" step="7" />
+											</td>
+											<td colspan="1">
+												<label class="FiraFont uppercase" for="CertificateDateLength">Certificate Date Length <small>(required)</small></label>
+												<input 
+													type="number"
+													class="input-medium"
+													style="height:30px;"
+													data-ng-model="new_equipment.CertificateDateLength"
+													id="CertificateDateLength" name="CertificateDateLength" 
+													required="required" placeholder="Certificate Date Length" min="7" step="7" />
+											</td>
+											<td colspan="1">
+												<label class="FiraFont uppercase" for="AppointmentDateLength">Appointment Date Length <small>(required)</small></label>
+												<input 
+													type="number"
+													class="input-medium"
+													style="height:30px;"
+													data-ng-model="new_equipment.AppointmentDateLength"
+													id="AppointmentDateLength" name="AppointmentDateLength" 
+													required="required" placeholder="PTO Date"  min="7" step="7" />
+											</td>
+											<td colspan="1" class="tc">
+												  <input type="submit" class="submit_button uppercase FiraFont btn btn-large btn-success" value="Add Equipment" name="submit" data-ng-disabled="formEquipmentNew.$invalid" />
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<div data-ng-transclude></div>
+
+								<input type="text" id="cookie_jar" name="cookie_jar" class="hidden" />
+
+								<input type="hidden" name="model" value="equipment" />
+
+							</form>

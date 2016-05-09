@@ -1,0 +1,38 @@
+							<form method="post" id="formOccupationNew" name="formOccupationNew" enctype="multipart/form-data" class="prForm clearfix" novalidate="novalidate" data-ng-submit="save()">
+								<h4 class="assistive-text">New Occupation Form</h4>
+								<br />
+								<div 
+									class="alert alert-block"
+									data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+									data-ng-show="formFeedBack">
+										<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+								</div>
+								
+								<table class="table footable">
+									<tbody>
+										
+										<tr>
+											<td colspan="4" class="tc">
+												<input 
+													type="text"
+													class="input-large"
+													style="height:30px;width:90%;margin:0 auto;"
+													data-ng-model="new_occupation.Name"
+													id="Name" name="Name" 
+													required="required" placeholder="Occupation name" data-ng-minlength="3" />
+											</td>
+											
+											<td colspan="1" class="tc">
+												 <input type="submit" class="submit_button uppercase FiraFont btn btn-large btn-success" value="Add Occupation" name="submit" data-ng-disabled="formOccupationNew.$invalid" />
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<div data-ng-transclude></div>
+
+								<input type="text" id="cookie_jar" name="cookie_jar" class="hidden" />
+
+								<input type="hidden" name="model" value="equipment" />
+
+							</form>

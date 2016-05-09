@@ -1,0 +1,188 @@
+			
+				<div class="row">
+					<div class="columns sixteen tc">
+						<div class="navbar-fixed-top" style="width:100px;">
+							<div class="menu row tc">
+								<ul id="menu-dashboard-menu" class="clearfix unstyled primary-nav-menu">
+
+									<div data-ng-switch on="renderPath[ 0 ]">
+
+										<!-- MAIN MENU -->
+										<div data-ng-cloak class="anim8-page main" data-ng-switch-when="dashboard">
+
+											<li class="menu-item menu-item-type-post_type menu-item-object-page page_item">
+												<a href="javascript:;" data-ng-click="openPage('menu')" title="Main Menu"><span class="icon-home"></span></a>
+											</li>
+
+										</div>
+
+										<!-- REPORT -->
+										<div data-ng-cloak class="anim8-page main" data-ng-switch-when="report">
+
+											<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+
+												<li class="menu-item menu-item-type-post_type menu-item-object-page page_item">
+													<a href="javascript:;" data-ng-click="goToHome()" title="Go Back"><span class="icon-chevron-left"></span></a>
+												</li>
+
+											</div>
+
+										</div>
+
+										<!-- SETTINGS -->
+										<div data-ng-cloak class="anim8-page main" data-ng-switch-when="settings">
+
+											<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+												<nav class="cd-side-navigation drop-shadow-right">
+													<ul>
+														<li>
+															<a 
+																href="javascript:;" 
+																title="Main Menu"
+																data-ng-click="openPage('menu')" data-menu="index">
+																	<span class="icon-home"></span>
+															</a>
+														</li>
+
+														<li>
+															<a 
+																href="javascript:;" 
+																title="Data" 
+																data-ng-click="openPage('settings-dataLibrary')" data-menu="dataLibrary">
+																	<span class="icon-cabinet3"></span>
+															</a>
+														</li>
+
+														
+														<li>
+															<a 
+																href="javascript:;" 
+																title="employees" 
+																data-ng-click="openPage('settings-employees')" data-menu="employees">
+																	<span class="icon-users"></span>
+															</a>
+														</li>
+
+														<li>
+															<a 
+																href="javascript:;" 
+																title="equipment" 
+																data-ng-click="openPage('settings-equipment')" data-menu="equipment">
+																	<span class="icon-cog2"></span>
+															</a>
+														</li>
+														<li>
+															<a 
+																href="javascript:;" 
+																title="notifications" 
+																data-ng-click="openPage('settings-notifications')" data-menu="notifications">
+																	<span class="icon-email"></span>
+															</a>
+														</li>
+														<!--
+														
+														-->
+														<!--
+														<li>
+															<a 
+																href="javascript:;" title="Reports" 
+																data-ng-click="openPage('settings-reports')" data-menu="reports">
+																	<span class="icon-graph"></span>
+															</a>
+														</li>
+														
+														
+														<li>
+															<a 
+																href="javascript:;" 
+																title="Configuration" data-menu="config"
+																data-ng-click="openPage('settings-config')">
+																<span class="icon-site-map"></span>
+															</a>
+														</li>
+														-->
+
+														<li>
+															<a 
+																href="javascript:;" title="Home" data-menu="Home"
+																data-ng-click="openPage('home')">
+																	<span class="icon-site-map"></span>
+															</a>
+														</li>
+														<li>
+															<a 
+																href="javascript:;" title="Log Out" 
+																data-ng-click="openPage('logout')" data-menu="logout">
+																	<span class="icon-locked"></span>
+															</a>
+														</li>
+													</ul>
+												</nav> <!-- .cd-side-navigation -->
+												
+											</div>
+
+										</div>
+
+										<!-- LOGIN -->
+										<div data-ng-switch-when="login">
+											<!--
+											<li class="menu-item menu-item-type-post_type menu-item-object-page page_item" data-ng-hide="networkPaths.length == 0">
+												<a href="javascript:;" data-ng-cloak data-ng-click="openPage('settings')" title="Settings"><span class="icon-tools"></span></a>
+											</li>
+											
+											<li class="menu-item menu-item-type-post_type menu-item-object-page page_item refresher">
+												<a href="javascript:;" data-ng-cloak id="pam-refresh" data-ng-click="refreshData()" title="Refresh HSE"><span class="icon-spinner2"></span></a>
+											</li>-->
+
+										</div>
+
+										<!-- FILE EXPLORER -->
+										<div data-ng-switch-when="browse">
+
+											<div data-ng-switch on="renderPath[ 1 ]">
+
+												<!-- PRINT PREVIEW -->
+												<div data-ng-switch-when="printPreview">
+													<!-- -->
+													<li class="menu-item menu-item-type-post_type menu-item-object-page page_item">
+														<a href="javascript:;" data-ng-click="goBackPreview(pdfPreviewPath)" title="Go Back"><span class="icon-chevron-left"></span></a>
+													</li> <!-- -->
+
+												</div>
+
+												<!-- DEFAULT
+												<div data-ng-switch-default>
+													
+													<li class="menu-item menu-item-type-post_type menu-item-object-page page_item" style="top:19.5em;">
+														<a href="javascript:;" data-ng-click="toggleSearch()" title="Search"><span class="icon-magnifier"></span></a>
+													</li>
+
+												</div> -->
+
+											</div>
+
+											<!--
+											<li class="menu-item menu-item-type-post_type menu-item-object-page page_item fr" data-ui-scroll-to-top>
+												<a
+													href="javascript:;"
+													data-ng-cloak 
+													data-ng-click="goToTop()" title="Scroll To Top">
+														<span class="icon-chevron-up"></span>
+												</a>
+											</li> -->
+
+										</div>
+
+										<!-- DEFAULT -->
+										<div data-ng-switch-default></div>
+
+									</div>
+									
+								</ul>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				
+			

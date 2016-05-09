@@ -1,0 +1,95 @@
+<!-- 
+* Copyright (c) 2013 - 2015 @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
+* 
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+
+<div class="row" id="keyboardHolder">
+	<div class="columns sixteen tc">
+		<tour 
+			step="currentStep">
+				
+				<!--
+				<span 
+					style="z-index:9999;"
+					on-proceed="tourStepComplete()"
+					use-source-scope="true"
+					tourtip-container-element="#keyboardHolder"
+					tourtip-step="2"
+					tourtip-backDrop="true"
+					tourtip-placement="top"
+					tourtip-next-label="Continue"
+					tourtip-offset-vertical="-700"
+		    		tourtip-offset-horizontal="800"
+					tourtip="Tap the search field and use the on-screen keyboard to type the name of the document that you are looking for.  Press the green search button to start your search."></span> -->
+
+				<ul id="keyboard">
+					<li class="symbol"><span class="off" data-ng-click="keyPress('`')">`</span><span class="on">~</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('1')">1</span><span class="on">!</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('2')">2</span><span class="on">@</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('3')">3</span><span class="on">#</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('4')">4</span><span class="on">$</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('5')">5</span><span class="on">%</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('6')">6</span><span class="on">^</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('7')">7</span><span class="on">&amp;</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('8')">8</span><span class="on">*</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('9')">9</span><span class="on">(</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('0')">0</span><span class="on">)</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('-')">-</span><span class="on">_</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('=')">=</span><span class="on">+</span></li>
+					<li class="delete lastitem" data-ng-click="backSpace()">Delete</li>
+					<li class="tab"></li>
+					<li class="letter" data-ng-click="keyPress('q')">q</li>
+					<li class="letter" data-ng-click="keyPress('w')">w</li>
+					<li class="letter" data-ng-click="keyPress('e')">e</li>
+					<li class="letter" data-ng-click="keyPress('r')">r</li>
+					<li class="letter" data-ng-click="keyPress('t')">t</li>
+					<li class="letter" data-ng-click="keyPress('y')">y</li>
+					<li class="letter" data-ng-click="keyPress('u')">u</li>
+					<li class="letter" data-ng-click="keyPress('i')">i</li>
+					<li class="letter" data-ng-click="keyPress('o')">o</li>
+					<li class="letter" data-ng-click="keyPress('p')">p</li>
+					<li class="symbol"><span class="off">[</span><span class="on">{</span></li>
+					<li class="symbol"><span class="off">]</span><span class="on">}</span></li>
+					<li class="symbol lastitem"><span class="off">\</span><span class="on">|</span></li>
+					<li class="capslock" data-ng-click="toggleCaps()">Caps</li>
+					<li class="letter" data-ng-click="keyPress('a')">a</li>
+					<li class="letter" data-ng-click="keyPress('s')">s</li>
+					<li class="letter" data-ng-click="keyPress('d')">d</li>
+					<li class="letter" data-ng-click="keyPress('f')">f</li>
+					<li class="letter" data-ng-click="keyPress('g')">g</li>
+					<li class="letter" data-ng-click="keyPress('h')">h</li>
+					<li class="letter" data-ng-click="keyPress('j')">j</li>
+					<li class="letter" data-ng-click="keyPress('k')">k</li>
+					<li class="letter" data-ng-click="keyPress('l')">l</li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress(';')">;</span><span class="on">:</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress(',')">'</span><span class="on">&quot;</span></li>
+					<li class="return lastitem ir">Return</li>
+					<li class="left-shift" data-ng-click="toggleShift()">Shift</li>
+					<li class="letter" data-ng-click="keyPress('z')">z</li>
+					<li class="letter" data-ng-click="keyPress('x')">x</li>
+					<li class="letter" data-ng-click="keyPress('c')">c</li>
+					<li class="letter" data-ng-click="keyPress('v')">v</li>
+					<li class="letter" data-ng-click="keyPress('b')">b</li>
+					<li class="letter" data-ng-click="keyPress('n')">n</li>
+					<li class="letter" data-ng-click="keyPress('m')">m</li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress(',')">,</span><span class="on">&lt;</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('.')">.</span><span class="on">&gt;</span></li>
+					<li class="symbol"><span class="off" data-ng-click="keyPress('/')">/</span><span class="on">?</span></li>
+					<li class="right-shift lastitem" data-ng-click="toggleShift()">Shift</li>
+					<li class="space lastitem" data-ng-click="addSpace()">Space</li>
+				</ul>
+
+    	</tour>
+	</div>
+</div>

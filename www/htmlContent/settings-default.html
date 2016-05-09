@@ -1,0 +1,122 @@
+	<div class="row tile-content">
+		<br /><br />
+		<h3 class="tl FiraFont">Default configurations</h3>
+		<br />
+		<p>The Phola Coal HSE System consists of Documentation available in all departments, <strong>Phola</strong>, and main contractors; <strong>Minopex, Bidvest Magnum</strong> and <strong>Coallab</strong>.</p>
+		<hr />
+		<br />
+		<div class="row">
+			<div class="columns ten">
+				<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+					<collapsible-item title="Application Settings">
+						<div>
+							<p class="alert alert-block alert-info">Configure the default Printing Application for HSE.</p>
+							<br />
+							
+							<label for="pdfReader" class="tl FiraFont">{{hseConfig.paths.appFolders.pdf.Name}}</label>
+							<div class="input-append">
+								<input 
+									type="text" 
+									name="pdfReader" 
+									class="form-control input-xlarge" 
+									data-ng-model="config.pdf.Path" 
+									style="border-radius: 999px 0 0 999px;" required>
+								<button 
+									class="btn add-on btn-default FiraFont uppercase FiraFont brwse-btn" 
+									type="button" data-ng-click="addFile('PDF')"
+									style="border: 1px solid #999 !important;color: #000;border-radius: 0 99px 99px 0;padding: 0.65em;">Browse</button>
+							</div><!-- -->
+							<br /><br />
+							
+							<br />
+							<hr />
+							<br />
+							<!--
+							<label for="pdfReader" class="tl FiraFont"><strong>Permitted File Types</strong>:</label>
+							<table class="table footable hoverable">
+								<thead>
+									<tr class="tl uppercase mask-money">
+										<th>File Type</th>
+										<th>View</th>
+										<th>Print</th>
+										<th>Preview</th>
+										<th>Default App</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr data-ng-repeat="dbFType in hseConfig.FileTypes">
+										<td>{{dbFType.extension}}</td>
+										 VISISIBLE OR NOT? 
+										<td>
+											<label class="switch">
+												<input type="checkbox" data-ng-model="dbFType.visibility"><i title="Make File Type Visible?"></i>
+											</label>
+										</td>
+										 PRINTABLE OR NOT? 
+										<td>
+											<label class="switch">
+												<input type="checkbox" data-ng-model="dbFType.print"><i title="Is File Type Printable?"></i>
+											</label>
+										</td>
+										 PREVIEWABLE OR NOT? 
+										<td>
+											<label class="switch">
+												<input type="checkbox" data-ng-model="dbFType.preview"><i title="Preview File Type?"></i>
+											</label>
+										</td>
+										 APP 
+										<td>
+											<div class="input-append">
+												<input 
+													type="text" 
+													class="form-control"
+													data-ng-model="dbFType.app_path"
+													style="border-radius: 999px 0 0 999px;" required>
+												<button 
+													class="btn add-on btn-default btn-success FiraFont uppercase FiraFont brwse-btn" 
+													type="button" data-ng-click="addFile( 'PDF', $index )"
+													style="border: 1px solid rgb(153, 153, 153) !important;">Browse</button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table> -->
+							<br /><br />
+						</div>
+					</collapsible-item>
+										
+				</ang-accordion>
+			</div>
+			<div class="columns five">
+				<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+					
+					<collapsible-item title="Information Categories" initially-open="true">
+						<div>
+							The following <strong>Information Categories</strong> are available:</p>
+							<ul class="FiraFont">
+								<li>Change Management</li>
+								<li>Managament Briefs</li>
+								<li>Newsflashes</li>
+								<li>Planned Task Observation</li>
+								<li>Policies</li>
+								<li>Pre-use inspection checklists</li>
+								<li>Procedures</li>
+								<li>Risk Assessments</li>
+								<li>Toolbox Talks</li>
+								<li>Material Safety Data Sheets (MSDS)</li>
+								<li>Environmental Documents</li>
+							</ul>
+						</div>
+					</collapsible-item>
+														
+				</ang-accordion>
+			</div>
+
+		</div>
+		<br />
+		<hr />
+		<br />
+		<button type="button" class="btn btn-block btn-success FiraFont uppercase macdaddy-rounded" style="padding:1.5em 1em;" data-ng-click="saveSettings()">Save Settings</button>
+		<br />
+	</div>

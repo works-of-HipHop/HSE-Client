@@ -1,0 +1,78 @@
+							<form method="post" id="formEquipmentEdit" name="formEquipmentEdit" enctype="multipart/form-data" class="prForm clearfix" novalidate="novalidate" data-ng-submit="save()">
+								<h4 class="assistive-text">Edit Equipment Form</h4>
+								<br />
+								<div 
+									class="alert alert-block"
+									data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+									data-ng-show="formFeedBack">
+										<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+								</div>
+								
+								<div class="row">
+									<div class="columns eight">
+										<label class="FiraFont uppercase" for="Name">Name <small>(required)</small></label>
+										<input 
+											type="text"
+											data-ng-model="active_equipment.Name"
+											id="Name" name="Name" 
+											required="required" placeholder="" data-ng-minlength="3" />
+									</div>
+									<div class="columns eight"></div>
+								</div>
+								<br />
+								<div class="row">
+									<div class="columns five" data-ng-model="active_equipment.data[key]" data-ng-repeat="(key,value) in active_equipment.data">
+										<label class="FiraFont uppercase">{{value.dateName}} <small>(required)</small></label>
+										<!-- ng-model="active_equipment.data[key]" -->
+										<input 
+											type="number"
+											value="{{value.dateLength}}"
+											id="Name" name="Name"
+											required="required" data-ng-minlength="30" />
+									</div>
+								</div>
+								<br />
+								<hr />
+								<br />
+								<div class="row">
+									<div class="columns sixteen">
+										
+										<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+											<collapsible-item title="Occupations" initially-open="true">
+												<div>
+
+													<div class="grid-4-equalHeight">
+														<div class="col" data-ng-repeat="(key,value) in hse_data.occupation" >
+															<input
+																type="checkbox"
+																id="equipmentOccupation"
+																data-uid="{{value.ID}}"
+																class="equipment-occupation"
+																data-ng-click="toggleEquipment(value.ID)"
+																name="equipmentOccupation[]"
+																value="{{value.ID}}"
+																/>&nbsp;<span>{{value.Name}}</span>
+														</div>
+													</div>
+												</div>
+											</collapsible-item>
+
+										</ang-accordion>
+
+									</div>
+								</div>
+								<br />
+								<br />
+								<hr />
+								<br />
+								
+								<div data-ng-transclude></div>
+
+								<input type="text" id="cookie_jar" name="cookie_jar" class="hidden" />
+                                            
+								<input type="hidden" name="model" value="equipment" />
+                                
+                                <input type="submit" class="submit_button uppercase FiraFont btn btn-large btn-success" value="Save" name="submit" data-ng-disabled="formEquipmentEdit.$invalid" />
+
+							</form>

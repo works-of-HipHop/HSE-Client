@@ -1,0 +1,190 @@
+							<form method="post" id="formEmployeeNew" name="formEmployeeNew" enctype="multipart/form-data" class="prForm clearfix" novalidate="novalidate" data-ng-submit="save()">
+								<h4 class="assistive-text">Edit Employee Form</h4>
+								<br />
+								<div 
+									class="alert alert-block"
+									data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+									data-ng-show="formFeedBack">
+										<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+								</div>
+								
+								<div class="row">
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="userTypeID">Type of Account <small>(required)</small></label>
+										<select 
+											id="userTypeID"
+											name="userTypeID" 
+											required="required" 
+											data-ng-model="new_employee.userTypeID"
+											data-ng-options="a.ID as a.Name for a in hse_data.userType">
+												<option value="">Select an employee type&hellip;</option>
+										</select>
+									</div>
+									<div class="columns eleven"></diV>
+								</div>
+								<br />
+								<div class="row">
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="occupationID">Occupation <small>(required)</small></label>
+										<select 
+											id="occupationID"
+											name="occupationID" 
+											required="required"
+											data-ng-disabled="new_employee.occupation <= 0 "
+											data-ng-model="new_employee.occupationID"
+											data-ng-options="a.ID as a.Name for a in hse_data.occupation">
+												<option value="">Select a Occupation&hellip;</option>
+										</select>
+									</div>
+									
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="departmentID">Department <small>(required)</small></label>
+										<select 
+											id="departmentID"
+											name="departmentID" 
+											required="required"
+											data-ng-disabled="new_employee.department <= 0  "
+											data-ng-model="new_employee.departmentID"
+											data-ng-options="a.ID as a.Name for a in hse_data.department">
+												<option value="">Select a Department&hellip;</option>
+										</select>
+									</div>
+									<div class="columns six"></diV>
+								</div>
+								
+								<br />
+								<div class="row">
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="firstName">First Name <small>(required)</small></label>
+										<input 
+											type="text"
+											data-ng-model="new_employee.firstName"
+											id="firstName" name="firstName" 
+											required="required" placeholder="" data-ng-minlength="3" />
+									</div>
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="lastName">Last Name <small>(required)</small></label>
+										<input 
+											type="text"
+											data-ng-model="new_employee.lastName"
+											id="lastName" name="lastName" 
+											required="required" placeholder="" data-ng-minlength="3" />
+									</div>
+									<div class="columns six"></diV>
+								</div>
+								<br />
+								<div class="row">
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="idNumber">I.D. Number <small>(required)</small></label>
+										<input 
+											type="text" 
+											id="idNumber"  name="idNumber"
+											data-ng-model="new_employee.idNumber"
+											placeholder="ID Number" data-ng-minlength="3" data-ng-maxlength="13" required="required" />
+									</div>
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="employeeNumber">Employee No. <small>(required)</small></label>
+										<input 
+											type="tel" 
+											name="employeeNumber"
+											id="employeeNumber" class="input-medium"
+											data-ng-model="new_employee.employeeNumber"
+											data-ng-min=length"3" maxlength="9" placeholder="Employee number"  />
+										
+									</div>
+									<div class="columns six"></diV>
+								</div>
+								<br />
+								<div class="row">
+									<div class="columns sixteen">
+										<label class="FiraFont uppercase" for="equipmentOccupation">Equipment <small>(required)</small></label>
+										<table class="table footable">
+											<tbody>
+												<tr>
+													<td colspan="1">
+														<select 
+															id="employeeMeta"
+															name="employeeMeta[]" 
+															required="required"
+															data-ng-disabled="hse_equipment <= 0 "
+															data-ng-model="new_employee.employeeMeta"
+															data-ng-options="a.ID as a.Name for a in hse_equipment">
+																<option value="">Select Equipment&hellip;</option>
+														</select>
+													</td>
+													<td colspan="1">
+														<input 
+															type="date"
+															class="input-medium"
+															style="height:30px;"
+															data-ng-model="new_employee.PTODate"
+															id="PTODate" name="PTODate" 
+															required="required" placeholder="PTO Date" data-ng-minlength="4" />
+													</td>
+													<td colspan="1">
+														<input 
+															type="date"
+															class="input-medium"
+															style="height:30px;"
+															data-ng-model="new_employee.PTODate"
+															id="PTODate" name="PTODate" 
+															required="required" placeholder="PTO Date" data-ng-minlength="4" />
+													</td>
+													<td colspan="1">
+														<input 
+															type="date"
+															class="input-medium"
+															style="height:30px;"
+															data-ng-model="new_employee.PTODate"
+															id="PTODate" name="PTODate" 
+															required="required" placeholder="PTO Date" data-ng-minlength="4" />
+													</td>
+													<td colspan="1">
+														<button type="button" data-ng-click="allocateEquipment(new_employee.ID)" class="btn btn-large tc mask-money">Add</button>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+										<table id="equipment-table-link" class="table footable hoverable ScrolltableContainer">
+																	
+											<thead>
+												<tr class="tl uppercase mask-money" style="cursor:pointer;">
+													<th class="tc" style="width:50px;">
+														<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
+															<span class="icon-checkmark3 alert-success"></span>
+														</button>
+													</th>
+													<th class="sortable" data-sid="Name" data-ng-click="setSortExpression('Name')">Name</th>
+													<th class="sortable" data-sid="dateAdded" data-ng-click="setSortExpression('dateAdded')">PTO Date</th>
+													<th class="sortable" data-sid="dateAdded" data-ng-click="setSortExpression('dateAdded')">Certificate Date</th>
+													<th class="sortable" data-sid="dateAdded" data-ng-click="setSortExpression('dateAdded')">Appointment Date</th>
+													<th colspan="1"></th>
+												</tr>
+											</thead>
+											<tbody class="TableScrollContent">
+												<tr data-ng-show="new_employee.meta == 0">
+													<td colspan="6" class="data-loading alert alert-block alert-info">
+														<p class="FiraFont">There are is no equipment allocated at the moment.</p>
+													</td>
+												</tr>
+											</tbody>
+											<tfoot class="footable-pagination tc">
+												
+											</tfoot>
+										</table> 
+
+									</div>
+								</div>
+								<br />
+								<hr />
+								<br />
+								
+								<div data-ng-transclude></div>
+
+								<input type="text" id="cookie_jar" name="cookie_jar" class="hidden" />
+                                            
+								<input type="hidden" name="model" value="employee" />
+                                
+                                <input type="submit" class="submit_button uppercase FiraFont btn btn-large btn-success" value="Add Employee" name="submit" data-ng-disabled="formEquipmentEdit.$invalid" />
+
+							</form>

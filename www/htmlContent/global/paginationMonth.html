@@ -1,0 +1,29 @@
+<div class="tc">
+	<div class="btn-group accountingPeriodFilter">
+		<button 
+			type="button" 
+			class="btn accountingPeriodFilterBtn" 
+			data-ng-click="toggleMonth( 'all' )" 
+			data-ng-class="{'alert-success': '*' == pam_currentMonth }" 
+			value="*">
+				All
+		</button>
+		<button type="button" class="btn accountingPeriodFilterBtn" data-ng-click="toggleMonth( key )" data-mid="{{key}}" data-ng-repeat="(key, value) in calendar" value="{{key}}" data-ng-class="{'alert-success': key == pam_currentMonth }">
+			{{value.name | trunk8:3}}&nbsp;&nbsp;<span class="icon-caret-down"></span>
+			<ul class="monthFilterYears unstyled hidden">
+				<li class="tl btn fl" data-ng-repeat="data in finYears()">
+					<a href="javascript:;" data-yid="{{key}}-{{data}}" data-ng-click="setTimeContext( key, data )">{{data}}</a>
+				</li>
+			</ul>
+		</button>
+		
+	</div>
+</div>
+<!--
+<div class="tc">
+	<div class="btn-group">
+		<button type="button" class="btn" data-ng-click="toggleMonth( $event )" data-ng-repeat="(key, value) in calendar" value="{{key}}" data-ng-class="{'alert-success': key == pam_currentMonth }">
+			{{value.name | trunk8:3}}&nbsp;&nbsp;<span class="icon-caret-down"></span>
+		</button>
+	</div>
+</div> -->

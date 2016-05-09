@@ -1,0 +1,87 @@
+	
+	<div class="row">
+		<div class="columns fourteen">
+			<h1 class="tl mask-money uppercase"><strong>{{active_date.equipmentName}}</strong> EQUIPMENT DATES FOR: <strong>{{active_employee.firstName}} {{active_employee.lastName}} ({{active_employee.idNumber}}) </strong></h1>
+			
+		</div>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="columns sixteen">
+			<div 
+				class="alert alert-block"
+				data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+				data-ng-show="formFeedBack">
+					<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+			</div>
+			<br />
+			<table class="table footable employee-equipment">
+				<tbody>
+					<tr class="tc">
+						<td>
+							<label class="FiraFont tl" for="employeeMeta[]">Equipment Name</label>
+						</td>
+						<td>
+							<label class="FiraFont" for="PTODate">PTO Date</label>
+							<label class="switch tc">
+								<input type="checkbox" data-ng-model="active_pto" data-ng-checked="active_pto" data-ng-change="toggleDate('pto')">
+								<i title="PTO Date?"></i>
+							</label>
+						</td>
+						<td>
+							<label class="FiraFont" for="CertificateDate">Certificate Date</label>
+							<label class="switch tc">
+								<input type="checkbox" data-ng-model="active_certificate" data-ng-checked="active_certificate"  data-ng-change="toggleDate('certificate')">
+								<i title="Certificate Date?"></i>
+							</label>
+						</td>
+						<td>
+							<label class="FiraFont" for="AppointmentDate">Appointment Date</label>
+							<label class="switch tc">
+								<input type="checkbox" data-ng-model="active_appointment" data-ng-checked="active_appointment"  data-ng-change="toggleDate('appointment')">
+								<i title="Appointment Date?"></i>
+							</label>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="1">
+							{{active_date.equipmentName}}
+						</td>
+						<td colspan="1">
+							<input 
+								type="date"
+								class="input-medium"
+								style="height:30px;"
+								data-ng-model="active_date.PTODate"
+								id="PTODate" name="PTODate" 
+								required="required" placeholder="PTO Date" />
+						</td>
+						<td colspan="1">
+							<input 
+								type="date"
+								class="input-medium"
+								style="height:30px;"
+								data-ng-model="active_date.certificateDate"
+								id="certificateDate" name="certificateDate" 
+								required="required" placeholder="Certificate Date" />
+						</td>
+						<td colspan="1">
+							<input 
+								type="date"
+								class="input-medium"
+								style="height:30px;"
+								data-ng-model="active_date.appointmentDate"
+								id="appointmentDate" name="appointmentDate" 
+								required="required" placeholder="Appointment Date" />
+						</td>
+						<td colspan="1">
+							<label class="FiraFont"></label>
+								<button type="button" data-ng-click="updateAllocation(active_date.equipmentID)" class="btn btn-large tc btn-success mask-money">Update</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<hr />

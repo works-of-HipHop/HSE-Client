@@ -1,0 +1,11 @@
+{
+	"name"				: "Phola Coal HSE",
+	"version"			: "1.2",
+	"description"		: "Phola Coal HSE",
+	"author"			: "Max Verified <ideations@5ivedesign.co.za>",
+	"license"			: "MIT",
+	"auto-updater"		: {
+							"repo": "5iDS/hse",
+							"branch": "master"
+	}
+}

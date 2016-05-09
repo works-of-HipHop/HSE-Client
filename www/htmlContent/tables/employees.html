@@ -1,0 +1,202 @@
+					<div class="row">
+						<div class="columns twelve" >
+							<h3 class="FiraFont uppercase mask-money">
+								<strong>Employees</strong>&nbsp;<span class="badge badge-success">{{hse_employees.length}}</span>
+							</h3>
+						</div>
+						<div class="columns three">
+							
+							
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="columns sixteen">
+
+							<div data-ui-form-employee-new></div>
+
+							<hr />
+
+						</div>
+					</div>
+
+					<br />
+
+					<div class="row">
+						<div class="columns four">
+							<div id="filter-occupation" data-ui-filter-data data-ng-if="search_results == false">
+								<span class="anchor macdaddy-rounded">Show all Occupations</span>
+								<ul class="unstyled items">
+									<li bindonce data-ng-repeat="db in hse_data.occupation" class="mask-money tl uppercase">
+										<div class="row">
+											<div class="columns two">
+												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="occupation" />
+											</div>
+											<div class="columns fourteen">
+												<span bo-text="db.Name"></span>&nbsp;(<span bo-text="db.totalEmployees"></span>)
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="columns four">
+							<div id="filter-department" data-ui-filter-data data-ng-if="search_results == false">
+								<span class="anchor macdaddy-rounded">Show all Departments</span>
+								<ul class="unstyled items">
+									<li bindonce data-ng-repeat="db in hse_data.department" class="mask-money tl uppercase">
+										<div class="row">
+											<div class="columns two">
+												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="department" />
+											</div>
+											<div class="columns fourteen">
+												<span bo-text="db.Name"></span>&nbsp;(<span bo-text="db.totalEmployees"></span>)
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="columns four">
+		
+							<div class="columns sixteen" data-ng-if="search_results == true">
+								<button type="button" class="btn btn-large btn-info macdaddy-rounded uppercase mask-money" data-ng-click="resetSearch()" style="padding: 1em;">Clear Search</button>
+							</div>
+
+							<div data-ng-if="search_results == false">
+										
+								<angucomplete-alt id="quick-search-employees"
+									placeholder="Search..."
+									text-searching="Searching Employees..."
+									text-no-results="No Employees Found"
+									pause="100"
+									selected-object="search"
+									local-data="hse_employees"
+									search-fields="idNumber,firstName,lastName,employeeNumber"
+									title-field="firstName"
+									description-field = "idNumber"
+									minlength="3"
+									clear-selected="true"
+									match-class="alert-success"
+									input-class="form-control form-control-small input-xlarge search-query" />
+
+							</div>
+
+						</div>
+						<div class="columns four tr">
+							<div class="btn-group fr">
+								<button type="button" data-ng-click="export( 'employees', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+									<span class="icon-file-pdf alert-error"></span>
+								</button>
+								<button type="button" data-ng-click="export( 'employees', 'csv' )" class="btn btn-large" data-title="Export Excel">
+									<span class="icon-file-excel alert-success"></span>
+								</button>
+								<button 
+									type="button" 
+									data-ng-click="refreshData()"
+									class="btn dataRefresher refresh-data-employees full-rounded fr" >
+										<span class="icon-loop alert-info" title="Refresh Data"></span>
+								</button>
+							</div>
+						</div>
+						
+					</div>
+					<!--
+					<br />
+					<div class="row">
+						<div claas="columns sixteen">
+							<div class="btn-group">
+								<button type="button" class="macdaddy-rounded cd-btn FiraFont uppercase">Search</button>
+							</div>
+						</div>
+					</div> -->
+					
+					<br /><br />
+					
+					<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_employees.length <= 0">
+						<p class="FiraFont">There are no Employees linked within this Profile at the moment.</p>
+					</div>
+					<table id="employees-table" class="table footable hoverable" data-ng-if="hse_employees.length > 0">
+						<thead>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th style="width:50px;">
+									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
+										<span class="icon-checkmark3 alert-success"></span>
+									</button>
+								</th>
+								<th class="tc" colspan="6">Employee Details</th>
+								<th colspan="2" style="border:1px solid #ddd;">Action</th>
+							</tr>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th colspan="1"></th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="firstName" data-ng-click="setSortExpression('firstName')" colspan="1">First Name</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="lastName" data-ng-click="setSortExpression('lastName')" colspan="1">Last Name</th>
+								<th class="sortable" data-sid="employeeNumber" data-ng-click="setSortExpression('employeeNumber')">Employee No.:</th>
+								<th class="sortable" data-sid="idNumber" data-ng-click="setSortExpression('idNumber')">ID Number</th>
+								<th class="sortable" data-sid="userOccupation" data-ng-click="setSortExpression('userOccupation')">Occupation</th>
+								<th class="sortable" data-sid="departmentName" data-ng-click="setSortExpression('departmentName')">Department</th>
+								<th class="sortable" data-sid="emailAddress" data-ng-click="setSortExpression('emailAddress')">Email</th>
+								<th colspan="2" style="border:1px solid #ddd;"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tl" bindonce data-ng-repeat="data in hse_employees | paginate:50 track by data.ID">
+								
+								<td class="mask-money tc" style="width:50px;">
+									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
+								</td>
+								<td class="mask-money uppercase">
+									<span bo-text="data.firstName"></span>
+								</td>
+								<td class="mask-money uppercase" bo-text="data.lastName"></td>
+								<td class="mask-money uppercase" bo-text="data.employeeNumber"></td>
+								<td class="mask-money">
+									<span bo-text="data.idNumber"></span>
+								</td>
+								
+								<td class="mask-money" bo-text="data.userOccupation"></td>
+								<td class="mask-money" bo-text="data.departmentName"></td>
+								<td class="mask-money" bo-text="data.emailAddress"></td>
+								<td class="mask-money" colspan="2" style="width:50px;">
+									<button 
+										type="button" 
+										class="btn btn-info mask-money uppercase" 
+										data-ng-click="openDialog('employee-action', data.ID)" data-ng-disabled="fetchingData">
+											Actions
+									</button>
+								</td>
+		
+							</tr>
+						</tbody>
+						<tfoot class="footable-pagination tc">
+							<tr>
+								<td class="tc"colspan="1">
+									<!--
+									<select 
+										id="batchActions-linked-cards" 
+										disabled
+										data-ng-model="batch_actions"
+										data-ng-change="batchActions()">
+											<option value="">Action&hellip;</option>
+											<option value="balance">Get Balances</option>
+											<option value="statement">Generate Statements</option>
+									</select>
+									-->
+								</td>
+								<td colspan="9"><paginator></paginator></td>
+							</tr>
+						</tfoot>
+					
+					</table>
+
+					<script type="text/ng-template" id="employeeActions">
+						<div data-ui-modal-employee-actions></div>
+					</script>
+
+					<script type="text/ng-template" id="employeeEquipmentActions">
+						<div data-ui-modal-employee-equipment-actions></div>
+					</script>
+
+					<script type="text/ng-template" id="promptAllocation">
+						<div data-ui-modal-employee-prompt></div>
+					</script>

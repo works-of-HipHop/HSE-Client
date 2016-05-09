@@ -1,0 +1,24 @@
+	
+	<div class="row">
+		<div class="columns twelve">
+			
+			<h1 class="tl mask-money uppercase">Department DETAILS FOR: <strong>{{active_department.Name}}</strong></h1>
+			
+		</div>
+		<div class="columns four">
+			<button 
+				type="button"
+				class="btn btn-danger"
+				data-ng-click="deleteDepartment( active_department.ID )">
+					Remove
+			</button>
+
+		</div>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="columns sixteen">
+			<div data-ui-form-department-edit></div>
+		</div>
+	</div>
+	<hr />

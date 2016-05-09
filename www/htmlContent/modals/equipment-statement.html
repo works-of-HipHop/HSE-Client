@@ -1,0 +1,43 @@
+	<h1 class="tl mask-money uppercase">CARD STATEMENT FOR: <strong>{{statement.cardNumber}}</strong> | PROFILE NUMBER: <strong>{{statement.profileNumber}}</strong></h1>
+	<hr />
+	<div class="row">
+		<div class="columns sixteen">
+			<div class="input-prepend">
+				<span class="add-on">&nbsp;R&nbsp;</span>
+				<input type="text" style="height:30px;" data-ng-model="statement.balanceAmount" />
+			</div>
+		</div>
+	</div>
+	<table id="cards-table-balance" class="table footable hoverable">
+						
+		<thead>
+			<tr class="tl uppercase mask-money" style="cursor:pointer;">
+				<th>Date</th>
+				<th>Description</th>
+				<th>Type</th>
+				<th>Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr data-ng-if="statement.statement.length > 0" bindonce data-ng-repeat="data in statement.statement | paginate:20">
+				<td class="mask-money uppercase" bo-text="data.transactionDate.scalar | date:'dd/MM/yyyy HH:mm:ss' "></td>
+				<td class="mask-money uppercase" bo-text="data.transactionDescription"></td>
+				<td class="mask-money uppercase" bo-text="data.transactionType"></td>
+				<td class="mask-money uppercase tr">{{ data.transactionAmount / 100  | currency:"R " }}</td>
+			</tr>
+			<tr data-ng-if="statement.statement.length <= 0">
+				<td colspan="4">
+					<p class="alert alert-block alert-info tc FiraFont">
+						No Transactions For Selected Period
+					</p>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4">
+					<div data-paginator></div>
+				</td>
+			</tr>
+		</tfoot>
+	</table>

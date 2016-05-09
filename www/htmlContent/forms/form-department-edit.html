@@ -1,0 +1,154 @@
+							<form method="post" id="formDepartmentEdit" name="formDepartmentEdit" enctype="multipart/form-data" class="prForm clearfix" novalidate="novalidate" data-ng-submit="save()">
+								<h4 class="assistive-text">Edit Department Form</h4>
+								<br />
+								<div 
+									class="alert alert-block"
+									data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+									data-ng-show="formFeedBack">
+										<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+								</div>
+								
+								<div class="row">
+									<div class="columns five">
+										<label class="FiraFont uppercase" for="Name">Name <small>(required)</small></label>
+										<input 
+											type="text"
+											data-ng-model="active_department.Name"
+											id="Name" name="Name" 
+											required="required" placeholder="" data-ng-minlength="3" />
+									</div>
+									<div class="columns eleven tl">
+										<br />
+										  <input type="submit" class="submit_button uppercase FiraFont btn btn-large btn-success" value="Save" name="submit" data-ng-disabled="formDepartmentEdit.$invalid" />
+									</div>
+								</div>
+								
+								<br />
+								<hr />
+								<br />
+								<div class="row">
+									<div class="columns sixteen">
+										
+										<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+											<!--
+											<collapsible-item title="Occupations" initially-open="true">
+												<div>
+
+													<div class="grid-4-equalHeight">
+														<div class="col" data-ng-repeat="(key,value) in hse_data.occupation" >
+															<input
+																type="checkbox"
+																id="equipmentOccupation"
+																data-uid="{{value.ID}}"
+																class="equipment-occupation"
+																data-ng-click="toggleEquipment(value.ID)"
+																name="equipmentOccupation[]"
+																value="{{value.ID}}"
+																/>&nbsp;<span>{{value.Name}}</span>
+														</div>
+													</div>
+												</div>
+											</collapsible-item>
+											-->
+											<collapsible-item title="Supervisors" initially-open="false">
+												<div>
+
+													<table class="table footable">
+														<tbody>
+															<tr>
+																<td colspan="1">
+																	<label class="FiraFont" for="employeeMeta[]">Select Employee&hellip;</label>
+																	<select 
+																		id="employeeMeta"
+																		name="employeeMeta[]"																	
+																		data-ng-disabled="hse_employees <= 0 "
+																		data-ng-model="new_supervisor.userID"
+																		data-ng-options="a.ID as a.displayName for a in hse_employees | orderBy: 'displayName'">
+																			<option value="">Employee&hellip;</option>
+																	</select>
+																</td>
+																<td colspan="1">
+																	<label class="FiraFont" for="PTODate">Supervisor Password</label>
+																	<div class="input-prepend password">
+																		<input type="button" class="submit btn" name="generatePwd" data-ng-click="generatePassword()" id="generatePwd" value="Generate Password" style="border-radius:999px 0 0 999px;" />
+																		<input 
+																			type="text" 
+																			style="height:30px;border-radius:0 999px 999px 0;"
+																			class="input-medium search-query" 
+																			name="supervisorPass" id="supervisorPass" 
+																			placeholder=""
+																			data-ng-model="new_supervisor.supervisorPass"
+																			autocomplete="false" />
+																		
+																	</div>
+																</td>
+																<td colspan="1">
+																	<label class="FiraFont"></label>
+																	<button type="button" data-ng-click="allocateSupervisor(active_department.ID)" class="btn btn-large tc btn-success mask-money">Assign</button>
+																</td>
+															</tr>
+														</tbody>
+													</table>
+													<hr />
+													<!--
+													<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_employees.length <= 0">
+														<p class="FiraFont">There are no Supervisors assigned to this deparment at the moment.</p>
+													</div>
+													-->
+													<table id="equipment-table-link" class="table footable hoverable" data-ng-if="hse_employees.length > 0">
+																				
+														<thead>
+															<tr class="tl uppercase mask-money" style="cursor:pointer;">
+																<th class="tc" style="width:50px;"></th>
+																<th class="sortable" data-sid="Name" data-ng-click="setSortExpression('Name')">Name</th>
+																<th class="sortable" data-sid="PTODate" data-ng-click="setSortExpression('PTODate')">ID Number</th>
+																<th class="sortable" data-sid="appointmentDate" data-ng-click="setSortExpression('appointmentDate')">Employee Number</th>
+																<th class="sortable" data-sid="dateAdded" data-ng-click="setSortExpression('dateAdded')">Appointment Date</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr data-ng-show="active_department.supervisors == 0">
+																<td colspan="6" class="data-loading alert alert-block alert-info">
+																	<p class="FiraFont">There are no supervisors assigned to this department at the moment.</p>
+																</td>
+															</tr>
+															<tr class="tl" bindonce data-ng-repeat="(key, value) in active_department.supervisors">
+								
+																<td class="mask-money tl" style="width:50px;">
+																	<button type="button" class="btn alert-danger" data-ng-click="removeAllocation(value.userID, value.departmentID)">
+																		<span class="icon-cancel2 alert-danger"></span>
+																	</button>
+																</td>
+																<td class="tc mask-money uppercase" bindonce bo-text="value.displayName"></td>
+																<td class="tc mask-money uppercase" bindonce bo-text="value.idNumber"></td>
+																<td class="tc mask-money uppercase" bindonce bo-text="value.employeeNumber"></td>
+																<td class="tc mask-money uppercase" bindonce bo-text="value.appointmentDate | date: 'yyyy-MM-dd'"></td>
+																																																
+															</tr>
+															
+														</tbody>
+														<tfoot class="footable-pagination tc">
+															
+														</tfoot>
+													</table>
+												</div>
+											</collapsible-item>
+
+										</ang-accordion>
+
+									</div>
+								</div>
+								<br />
+								<br />
+								<hr />
+								<br />
+								
+								<div data-ng-transclude></div>
+
+								<input type="text" id="cookie_jar" name="cookie_jar" class="hidden" />
+                                            
+								<input type="hidden" name="model" value="department" />
+                                
+                              
+
+							</form>

@@ -1,0 +1,25 @@
+	
+	<div class="row">
+		<div class="columns fourteen">
+			
+			<h1 class="tl mask-money uppercase">EMPLOYEE DETAILS FOR: <strong>{{active_employee.firstName}} {{active_employee.lastName}} ({{active_employee.idNumber}}) - {{active_employee.userOccupation}} in {{active_employee.departmentName}}</strong></h1>
+			
+		</div>
+		<div class="columns two tc">
+			<button 
+				type="button"
+				class="btn btn-danger"
+				style="margin-right:2.5em;"
+				data-ng-click="deleteEmployee( active_employee.ID )">
+					Remove
+			</button>
+
+		</div>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="columns sixteen">
+			<div data-ui-form-employee-edit></div>
+		</div>
+	</div>
+	<hr />

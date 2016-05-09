@@ -1,0 +1,154 @@
+					
+					<div class="row">
+						<div class="columns sixteen">
+
+							<!-- <div data-ui-web-cam class="tc"></div> -->
+							<br />
+							<br />
+
+							<div class="row tc search-div" style="padding-top:3em;">
+
+								<div class="" data-ng-show="searchResults == true">
+									<button type="button" class="btn btn-block FiraFont macdaddy-rounded" style="padding:1em;font-size:1.8em;" data-ng-click="clearSearch()">
+										Clear Search
+									</button>
+								</div>
+
+								<div class="input-append" style="width:90%;font-size:1em;" data-ng-hide="searchResults == true">
+									<input 
+										type="search"
+										placeholder="Please enter your ID Number..."
+										class="mp-search search-query FiraFont tc"
+										data-ng-model="searchStr"
+										data-ui-touch-input />
+									<button
+										type="button"
+										style="border-radius:0 999px 999px 0;padding: 0.9em 1.35em;letter-spacing: 3px;font-size: 1.4em;background-color: #50C01C;border: 1px solid #0CA218;color: #fff;text-shadow: none;left: -4px;position: relative;"
+										data-ng-click="employeeSearch()"
+										class="btn FiraFont add-on">Search</button>
+
+								</div>
+												
+							</div>
+							<br />
+							<br />
+							<hr />
+
+						</div>
+					</div>
+					<br /><br />
+					<div class="row" data-ng-if="active_employee.length > 0">
+						<div class="columns twelve"></div>
+						<div class="columns four tr">
+							<div class="btn-group fr">
+								<button type="button" data-ng-click="export( 'report-employee', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+									<span class="icon-file-pdf alert-error"></span>
+								</button>
+								<!--
+								<button 
+									type="button" 
+									data-ng-click="refreshData()"
+									class="btn dataRefresher refresh-data-report-employees full-rounded fr" >
+										<span class="icon-loop alert-info" title="Refresh Data"></span>
+								</button> -->
+							</div>
+						</div>
+
+					</div>
+					
+					<br /><br />
+					
+					<table id="employees-table" class="table footable hoverable" style="margin-bottom:0;" data-ng-if="active_employee.length > 0">
+						<thead>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th style="width:50px;">
+									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
+										<span class="icon-checkmark3 alert-success"></span>
+									</button>
+								</th>
+								<th class="tc" colspan="6">Employee Details</th>
+							</tr>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th colspan="1"></th>
+								<th style="border-top:1px solid #ddd;" data-sid="firstName" data-ng-click="setSortExpression('firstName')" colspan="1">First Name</th>
+								<th style="border-top:1px solid #ddd;" data-sid="lastName" data-ng-click="setSortExpression('lastName')" colspan="1">Last Name</th>
+								<th data-sid="employeeNumber" data-ng-click="setSortExpression('employeeNumber')">Employee No.:</th>
+								<th data-sid="idNumber" data-ng-click="setSortExpression('idNumber')">ID Number</th>
+								<th data-sid="userOccupation" data-ng-click="setSortExpression('userOccupation')">Occupation</th>
+								<th data-sid="departmentName" data-ng-click="setSortExpression('departmentName')">Department</th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tl" bindonce data-ng-repeat="data in active_employee | paginate:50 track by data.ID">
+								
+								<td class="mask-money tl" style="width:50px;">
+									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
+								</td>
+								<td class="mask-money uppercase">
+									<span bo-text="data.firstName"></span>
+								</td>
+								<td class="mask-money uppercase" bo-text="data.lastName"></td>
+								<td class="mask-money uppercase" bo-text="data.employeeNumber"></td>
+								<td class="mask-money">
+									<span bo-text="data.idNumber"></span>
+								</td>
+								
+								<td class="mask-money" bo-text="data.userOccupation"></td>
+								<td class="mask-money" bo-text="data.departmentName"></td>
+		
+							</tr>
+						</tbody>
+											
+					</table>
+
+					<table id="employee-equipment-link" class="table footable hoverable" data-ng-if="active_employee.length > 0">
+																				
+						<thead>
+							<tr class="tl uppercase mask-money" style="border-bottom:1px solid #ddd;">
+								<th colspan="4" class="mask-money tc uppercase">Training & Licensing Details</th>
+							</tr>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th data-sid="Name" data-ng-click="setSortExpression('Name')">Equipment Name</th>
+								<th class="tc" data-sid="PTODate">PTO Date</th>
+								<th class="tc" data-sid="certificateDate">Certificate Date</th>
+								<th class="tc" data-sid="appointmentDate">Appointment Date</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<tr data-ng-show="active_employee.meta == 0">
+								<td colspan="4" class="data-loading alert alert-block alert-info">
+									<p class="FiraFont">There are is no equipment allocated at the moment.</p>
+								</td>
+							</tr>
+							<tr class="tl" bindonce data-ng-repeat="(key, value) in active_employee[0].meta">
+								
+								<td class="mask-money uppercase">
+									
+									<select 
+										required="required"
+										data-ng-model="value.equipmentID"
+										data-ng-disabled="true"
+										data-ng-options="a.ID as a.Name for a in hse_equipment">
+											<option value="">Select Equipment&hellip;</option>
+									</select>
+									
+								</td>
+								<td class="tc mask-money uppercase" bo-text="value.PTODate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money uppercase" bo-text="value.certificateDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money uppercase" bo-text="value.appointmentDate | date: 'yyyy-MMM-dd'"></td>
+																													
+							</tr>
+							
+						</tbody>
+						<tfoot class="footable-pagination tc">
+							<tr>
+								<td colspan="4"><paginator></paginator></td>
+							</tr>
+						</tfoot>
+					</table>
+
+					<script type="text/ng-template" id="reportActions">
+						<div data-ui-modal-report-actions></div>
+					</script>

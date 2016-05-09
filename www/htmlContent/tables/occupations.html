@@ -1,0 +1,119 @@
+					<div class="row">
+						<div class="columns eight" >
+							<h3 class="FiraFont uppercase mask-money">
+								<strong>Occupations</strong>&nbsp;<span class="badge badge-success">{{hse_occupations.length}}</span>
+							</h3>
+						</div>
+						<div class="columns eight">
+							
+							<div class="btn-group fr">
+								<button type="button" data-ng-click="export( 'occupations', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+									<span class="icon-file-pdf alert-error"></span>
+								</button>
+								<button type="button" data-ng-click="export( 'occupations', 'csv' )" class="btn btn-large" data-title="Export Excel">
+									<span class="icon-file-excel alert-success"></span>
+								</button>
+								<button 
+									type="button" 
+									data-ng-click="refreshData()"
+									class="btn dataRefresher refresh-data-occupations full-rounded fr" >
+										<span class="icon-loop alert-info" title="Refresh Data"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<br /><br />
+
+					<!--
+					<br />
+					<div class="row">
+						<div claas="columns sixteen">
+							<div class="btn-group">
+								<button type="button" class="macdaddy-rounded cd-btn FiraFont uppercase">Search</button>
+							</div>
+						</div>
+					</div> -->
+					
+					<br />
+					
+					<div data-ui-form-occupation-new></div>
+
+					<hr />
+
+					<br />
+										
+					<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_occupations.length <= 0">
+						<p class="FiraFont">There are no Occupations linked within this Profile at the moment.</p>
+					</div>
+					<table id="occupations-table" class="table footable hoverable" data-ng-if="hse_occupations.length > 0">
+						<thead>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th style="width:50px;">
+									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
+										<span class="icon-checkmark3 alert-success"></span>
+									</button>
+								</th>
+								<th class="tc" colspan="2">Occupation Details</th>
+								<th colspan="2" style="border:1px solid #ddd;">Action</th>
+							</tr>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th colspan="1"></th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="Name" data-ng-click="setSortExpression('Name')" colspan="1">Name</th>
+								<!--<th class="sortable" style="border-top:1px solid #ddd;" data-sid="departmentName" data-ng-click="setSortExpression('departmentName')" colspan="1">Department</th> -->
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="totalEmployees" data-ng-click="setSortExpression('totalEmployees')" colspan="1">Total No. of Employees</th>
+								<th colspan="2" style="border:1px solid #ddd;"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tl" bindonce data-ng-repeat="data in hse_occupations | paginate:50 track by data.ID">
+								
+								<td class="mask-money tc" style="width:50px;">
+									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
+								</td>
+								<td class="mask-money uppercase">
+									<span bo-text="data.Name"></span>
+								</td>
+								<!--
+								<td class="mask-money uppercase">
+									<span bo-text="data.departmentName"></span>
+								</td>
+								-->
+								<td class="mask-money uppercase">
+									<span bo-text="data.totalEmployees"></span>
+								</td>
+								<td class="mask-money" colspan="2" style="width:50px;">
+									<button 
+										type="button" 
+										class="btn btn-info mask-money uppercase" 
+										data-ng-click="openDialog('occupation-action', data.ID)" data-ng-disabled="fetchingData">
+											Actions
+									</button>
+								</td>
+		
+							</tr>
+						</tbody>
+						<tfoot class="footable-pagination tc">
+							<tr>
+								<td class="tc"colspan="1">
+									<!--
+									<select 
+										id="batchActions-linked-cards" 
+										disabled
+										data-ng-model="batch_actions"
+										data-ng-change="batchActions()">
+											<option value="">Select a Batch Action&hellip;</option>
+											<option value="balance">Get Balances</option>
+											<option value="statement">Generate Statements</option>
+									</select>
+									-->
+								</td>
+								<td colspan="4"><paginator></paginator></td>
+							</tr>
+						</tfoot>
+					
+					</table>
+
+					<script type="text/ng-template" id="occupationActions">
+						<div data-ui-modal-occupation-actions></div>
+					</script>

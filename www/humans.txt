@@ -1,0 +1,19 @@
+﻿/* TEAM */
+
+	Developer:			S. Caetano
+	UX:					D. Maher
+	Site: 				www.5ivedesign.co.za
+	Twitter: 			@MaxVerified
+	Location: 			the edge of Creation
+	
+
+/*THANKS*/
+
+	Image(s):			404-Image (Tumbeats) by the Oatmeal; www.subtlepatterns.com
+	Icons:				icomoon.io
+
+/* SITE */
+
+	Last updated:		22/05/2015
+	Standards: 			HTML5, CSS3
+	Components: 		Node.js, RequireJS, Angular.JS

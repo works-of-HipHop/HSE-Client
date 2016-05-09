@@ -1,0 +1,21 @@
+<br />
+<div class="pagination tc" data-ng-show="paginator.pageCount() > 1">
+    <div class="btn-group">
+        <button class="btn" data-ng-click="paginator.firstPage()" data-ng-class="paginator.isFirstPage() && 'disabled'">
+            <i class="icon-backward" data-ng-class="paginator.isFirstPage() && 'icon-white'"></i>
+        </button>
+        <button class="btn" data-ng-click="paginator.previousPage()" data-ng-class="paginator.isFirstPage() && 'disabled'">
+            <i class="icon-chevron-left" data-ng-class="paginator.isFirstPage() && 'icon-white'"></i>
+        </button>
+        <button class="btn" data-ng-click="paginator.setPage(i)" data-ng-repeat="i in [] | forLoop:0:paginator.pageCount()" data-ng-class="paginator.page==i && 'active'">
+            {{i+1}}
+        </button>
+        <button class="btn" data-ng-click="paginator.nextPage()" data-ng-class="paginator.isLastPage() && 'disabled'">
+            <i class="icon-chevron-right" data-ng-class="paginator.isLastPage() && 'icon-white'"></i>
+        </button>
+        <button class="btn" data-ng-click="paginator.lastPage()" data-ng-class="paginator.isLastPage() && 'disabled'">
+            <i class="icon-forward" data-ng-class="paginator.isLastPage() && 'icon-white'"></i>
+        </button>
+    </div>
+    <br />
+</div>

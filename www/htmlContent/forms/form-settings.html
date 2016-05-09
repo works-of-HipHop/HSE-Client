@@ -1,0 +1,49 @@
+								<form id="formContact" class="prForm" enctype="multipart/form-data" method="post" data-ng-controller="contactusController" data-ng-submit="sendMessage()">
+
+									<div 
+										class="alert alert-block"
+										data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+										data-ng-show="formFeedBack">
+											<p class="statusMsg tc" style="margin:0 auto;" data-ng-model="formMsg">{{formMsg}}</p>
+									</div>
+									
+									<div id="formInputs">
+										<div class="row">
+											<div class="columns seven">
+												<label for="name">Name&nbsp;<small>(required)</small></label>
+												<input type="text" id="name" name="name" required="required" />
+												<br />
+											</div>
+											<div class="columns seven">
+												<label for="surname">Surname&nbsp;<small>(required)</small></label>
+												<input type="text" id="surname" name="surname" required="required" />
+												<br />
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="columns seven">
+												<label for="contact_no">Contact number&nbsp;<small>(required)</small></label>
+												<input type="tel" class="mask-no" id="contact_no" name="contact_no" placeholder="013 656 3132" required="required" />
+												<br />
+											</div>
+											<div class="columns seven">
+												<label for="email">E-Mail&nbsp;<small>(required)</small></label>
+												<input type="email" id="email" name="email" placeholder="youremail@domain.com" required="required" />
+												<br />
+											</div>
+										</div>
+										<br />
+										<textarea name="message" id="message" class="no_validation row clearfix" required="required" cols="50" rows="10" placeholder="Your Message&hellip;"  style="width:100%;"></textarea>
+										<hr />
+										
+										<br />
+										<?php //HONEYPOT ?>
+										<input type="text" id="veryNB" name="veryNB" class="hidden" value="" />
+									
+										<input type="submit" class="submit_button btn btn-large btn-success FiraFont" value="Send" name="submit" />
+                                        
+                                        <input type="hidden" name="action" value="ajax_contact" />
+
+									</div> <!-- END: #formInputs -->
+								</form>

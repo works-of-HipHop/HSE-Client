@@ -1,0 +1,38 @@
+								
+								<br />
+								<form id="formLogin" class="prForm" enctype="multipart/form-data" method="post" novalidate="novalidate" data-ng-submit="login()">
+									
+									<div id="formInputs" class="inner-me tc" style="width:60%;max-width:500px;margin:0 auto;">
+										
+										<div 
+											class="alert alert-block"
+											data-ng-cloak
+											data-ng-class="{ 'alert-info': formError == false, 'alert-error': formError == true}" 
+											data-ng-show="formFeedBack">
+												<p class="statusMsg tc" style="margin:0 auto;background:none;border:none;color:#333;" data-ng-model="formMsg">{{formMsg}}</p>
+										</div>
+										
+										<br />
+										<div class="login-input-group tc" style="width:100%;margin-bottom:1.5em;display:inline-block;">
+											<input 
+												type="email" name="username" 
+												data-ng-model="user.username" required="required" 
+												placeholder="youremail@domain.co.za" class="first-child" 
+											 />
+											<input 
+												type="password" name="password" 
+												data-ng-model="user.password" required="required" 
+												placeholder="Password" class="last-child" />
+										</div>
+										<br />
+										<hr />
+										<br />
+																				
+										<div data-ng-transclude></div>
+
+										<input type="text" id="veryNB" name="veryNB" class="hidden" value="" />
+										
+										<input type="submit" class="btn-block btn-large btn btn-success FiraFont menu-trigger uppercase" value="Login" name="login" data-ng-disabled="formLogin.$invalid" />
+
+									</div>
+								</form>

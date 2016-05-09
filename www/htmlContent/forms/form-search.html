@@ -1,0 +1,36 @@
+	<div class="row search-div hidden" style="padding-top:2em;margin-left:10em;border-top: 1px dotted hsl(0, 100%, 100%);">
+
+		<div class="" data-ng-show="searchResults == true">
+			<button type="button" class="btn btn-block FiraFont macdaddy-rounded" style="padding:1em;font-size:1.8em;" data-ng-click="clearSearch()">
+				Clear Search
+			</button>
+		</div>
+
+		<div class="input-append" style="width:90%;font-size:1em;" data-ng-hide="searchResults == true">
+			<input 
+				type="search"
+				placeholder="Search {{breadCrumbs[(breadCrumbs.length - 1)].Name}} for..."
+				class="mp-search search-query FiraFont"
+				data-ng-model="quickSearch" />
+			<button
+				type="button"
+				style="border-radius:0 999px 999px 0;padding:1.35em;"
+				data-ng-click="search()"
+				class="btn FiraFont add-on">Search</button>
+
+		</div>
+		<!--
+			<angucomplete-alt 
+				id="quick-search-documents"
+				placeholder="Search {{breadCrumbs[(breadCrumbs.length - 1)].Name}}"
+				text-searching="Looking for file..."
+				text-no-results="No Files Found"
+				pause="100"
+				selected-object="searchFile"
+				local-data="activeFolder"
+				minlength="1"
+				clear-selected="true"
+				match-class="alert-success"
+				input-class="mp-search macdaddy-rounded search-query" />
+		-->
+	</div>

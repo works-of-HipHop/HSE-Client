@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Phola Coal - HSE</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="public/styles/normalize.css">
+		<link rel="stylesheet" href="public/styles/bootstrap.min.css">
+		<link rel="stylesheet" href="public/styles/animate.min.css">
+		<link rel="stylesheet" href="public/styles/gridlex.min.css">
+		<link rel="stylesheet" href="public/styles/main.css">
+		<!-- <base href="/dashboard/" /> -->
+		<!-- Warn about failed cross origin requests in Chrome  
+    	<script defer type="application/javascript" src="xorigin.js"></script>
+    	-->
+    	<style type="text/css">
+			/* <![CDATA[ */
+				[ng-cloak], [data-ng-cloak]{ display: none !important; visibility: hidden; }
+			/* ]]> */
+		</style>
+	</head>
+	<body class="page ui-fontSize-default ui-lang-en singular one-column Fullwidth genesis" data-ng-controller="dashboardController">
+	
+			<header id="branding" data-ui-header data-ng-cloak></header>
+
+			<div data-ng-switch on="renderPath[ 0 ]">
+
+				 
+				<div data-ng-cloak class="full-rounded uppercase fr " data-ng-switch-when="settings">
+					<!-- help-tutorial
+					<a
+						href="javascript:;"
+						class="help-trigger"
+						data-ng-click="goRefresh()" title="Refresh Application">
+							<span class="icon-spinner" style="left:-6px;top:8px;"></span>
+					</a>
+					-->
+				</div> 
+
+				<!-- DEFAULT -->
+				<div data-ng-switch-default>
+
+					<div  
+						data-ng-cloak
+						class="help-tutorial full-rounded uppercase fr" >
+							<a
+								href="javascript:;"
+								class="help-trigger"
+								data-ng-click="toggleTour()" title="Press for Help">
+									<span class="icon-question"></span>
+							</a>
+					</div>
+
+				</div>
+
+			</div>
+
+			<p 
+				data-ng-cloak
+				class="mask-money fr"
+				style="margin-bottom:0;padding:1em;color:#444;text-shadow:1px 1px 1px #fff;margin-right: 2em;">
+				HSE v{{hse_version_number}}&nbsp;<small style="font-size:0.8em;">({{hse_running_time | millSecondsToTimeString}})</small><!--<small style="font-size:0.8em;">({{hse_running_time | millSecondsToTimeString}})</small>-->
+			</p>
+			
+			<!-- [BRANDING] -->
+			<div data-ng-switch on="renderPath[ 0 ]" style="position: relative;display: block;height: 150px;width: 100%;">
+
+				<!-- FILE EXPLORER -->
+				<div data-ng-switch-when="browse">
+
+					<div data-ng-switch on="renderPath[ 1 ]">
+
+						<!-- PRINT PREVIEW -->
+						<div data-ng-switch-when="printPreview"></div>
+
+						<!-- DEFAULT -->
+						<div data-ng-switch-default>
+			
+							<div class="phola-main-logo"></div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<!-- SETTINGS -->
+				<div data-ng-cloak class="anim8-page main" data-ng-switch-when="settings">
+
+					<div class="phola-main-logo"></div>
+					<br /><br />
+
+				</div>
+
+				<!-- DEFAULT -->
+				<div data-ng-switch-default>
+	
+					<div class="phola-main-logo"></div>
+
+				</div>
+			</div>
+			<!-- [/BRANDING] -->
+
+			<!-- [MAIN SECTION] -->
+			<section id="page" data-role="main">
+				<div id="pamela-dashboard" class="anim8 columns sixteen container dashboard closed-action clearfix">
+
+					<div class="spinner" role="presentation"><br /><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><br /><br /></div>
+
+					<div class="row bdp">
+
+						<div data-ng-view></div>
+							
+						<div class="columns sixteen main-content drop-shadow-left" data-ng-switch on="renderPath[ 0 ]">
+							
+							<!-- FILE EXPLORER -->
+							<div data-ng-cloak class="anim8-page main" data-ng-switch-when="browse">
+
+								<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+
+									<!-- PRINT PREVIEW -->
+									<div id="ppv" class="anim8-page account-page" data-ng-switch-when="printPreview">
+										<!--
+										<span 
+											style=""
+											on-proceed="tourStepComplete()"
+											tourtip-element=".menu-trigger"
+											tourtip-container-element="#ppv"
+											tourtip-step="0"
+											tourtip-backDrop = "true"
+											tourtip-placement="left"
+											tourtip-next-label="Open HSE"
+											tourtip-offset-vertical="10"
+    										tourtip-offset-horizontal="26"
+    										use-source-scope="true"
+											tourtip="Click / Tap on the Green Button to view the option screen."></span>-->
+
+										<data-ui-printpreview></data-ui-printpreview>
+
+										<script type="text/ng-template" id="printHelp">
+						
+											<div class="row">
+												<div class="columns sixteen">
+													<div data-ui-modal-print-help></div>
+												</div>
+											</div>
+
+										</script>
+
+									</div>
+								
+									<!-- DEFAULT -->
+									<div class="anim8-page browse-page" data-ng-switch-default>
+
+										<div data-ui-browser></div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+							<!-- REPORT -->
+							<div data-ng-cloak class="anim8-page main" data-ng-switch-when="report">
+								
+								<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+
+									<div class="anim8-page dashboard-page-report tile-content" data-ng-switch-when="employee">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br /><br /><br /><br />
+
+											<div class="row">
+												<div class="columns sixteen">
+
+													<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+														<collapsible-item title="Departments" initially-open="true">
+															<div>
+
+																<data-ui-table-departments></data-ui-table-departments>
+
+															</div>
+														</collapsible-item>
+
+														<collapsible-item title="Occupations" initially-open="false">
+															<div>
+
+																<data-ui-table-occupations></data-ui-table-occupations>
+
+															</div>
+														</collapsible-item>
+
+													</ang-accordion>
+
+												</div>
+												
+											</div>
+
+										</div>
+
+									</div>
+									
+									<div class="anim8-page dashboard-page-report tile-content" data-ng-switch-default>
+
+										<!--  -->
+										<br /><br /><br /><br /><br /><br /><br /><br />
+
+										<div data-ui-report></div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+							<!-- SETTINGS -->
+							<div data-ng-cloak class="anim8-page main" style="margin-left:7em;" data-ng-switch-when="settings">
+								
+								<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+
+									<div class="anim8-page dashboard-page-settings-password  tile-content" data-ng-switch-when="pwd">
+
+										<div class="row tile-content">
+
+											<div class="row">
+												<div class="columns sixteen">
+													<data-ui-form-password></data-ui-form-password>
+												</div>
+											</div>
+										
+										</div>
+
+									</div>
+
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-when="reports">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br /><br /><br />
+
+											<div data-ui-month-filter></div>
+											<br /><br />
+
+											<data-ui-table-report></data-ui-table-report>
+
+										</div>
+
+									</div>
+
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-when="notifications">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br />
+
+											<!--<div data-ui-month-filter></div>-->
+											<br /><br />
+
+											<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+												<!-- ALREADY EXPIRED -->
+												<collapsible-item class="alert-danger" title="Expired Licenses & Competencies Notifications" initially-open="false">
+
+													<div class="row">
+
+														<div class="columns sixteen">
+
+															
+															<data-ui-notifications-expired></data-ui-notifications-expired>
+
+														</div>
+
+													</div>
+
+												</collapsible-item>
+
+												<!-- ABOUT TO EXPIRE -->
+												<collapsible-item class="alert-warning" title="Upcoming Expiring Licenses & Competencies Notifications" initially-open="false">
+												
+													<div class="row">
+
+														<div class="columns sixteen">
+
+															<data-ui-notifications-pending></data-ui-notifications-pending>
+
+														</div>
+
+													</div>
+
+												</collapsible-item>
+
+											</ang-accordion>
+
+										</div>
+
+									</div>
+
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-when="employees">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br /><br /><br />
+
+											<data-ui-table-employees></data-ui-table-employees>
+
+										</div>
+
+									</div>
+
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-when="equipment">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br /><br /><br />
+
+											<data-ui-table-equipment></data-ui-table-equipment>
+
+										</div>
+
+									</div>
+
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-when="dataLibrary">
+
+										<div class="row tile-content">
+											
+											<br /><br /><br /><br /><br />
+
+											<div class="row">
+												<div class="columns sixteen">
+
+													<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+														<collapsible-item title="Departments" initially-open="true">
+															<div>
+
+																<data-ui-table-departments></data-ui-table-departments>
+
+															</div>
+														</collapsible-item>
+
+														<collapsible-item title="Occupations" initially-open="false">
+															<div>
+
+																<data-ui-table-occupations></data-ui-table-occupations>
+
+															</div>
+														</collapsible-item>
+
+													</ang-accordion>
+
+												</div>
+												
+											</div>
+
+										</div>
+
+									</div>
+									
+									<div class="anim8-page dashboard-page-settings tile-content" data-ng-switch-default>
+
+										<!--  -->
+										<br /><br /><br /><br /><br />
+
+										<div data-ui-widget-matrix-operations></div>
+
+
+										<!--
+										<div class="row">
+										
+											<div class="columns sixteen">
+
+												<ang-accordion one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+													<collapsible-item title="Departments" initially-open="false">
+														<div>
+
+															<data-ui-table-departments></data-ui-table-departments>
+
+														</div>
+													</collapsible-item>
+													<collapsible-item title="Occupations" initially-open="false">
+														<div>
+															<data-ui-table-occupations></data-ui-table-occupations>
+
+														</div>
+													</collapsible-item>
+
+												</ang-accordion>
+
+											</div>
+												
+										</div>
+										-->
+
+										<!--
+										<div class="grid-3_sm-2-equalHeight-center-middle-spaceBetween FiraFont">
+
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Browse Data"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-dataLibrary')">
+																<span class="icon-cabinet3"></span>
+														</button>
+
+													</div>
+
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Notifications"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-notifications')">
+																<span class="icon-email"></span>
+														</button>
+
+													</div>
+
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Employees"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-employees')">
+																<span class="icon-users"></span>
+														</button>
+
+													</div>
+
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Equipment"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-equipment')">
+																<span class="icon-cog2"></span>
+														</button>
+
+													</div>
+
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Reports"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-reports')">
+																<span class="icon-stats"></span>
+														</button>
+
+													</div>
+													
+													<div class="col">
+
+														<buttton 
+															type="button"
+															title="Configuration"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('settings-config')">
+																<span class="icon-site-map"></span>
+														</button>
+
+													</div>
+
+													<div class="col-12">
+
+														<buttton 
+															type="button"
+															title="Logout"
+															class="cd-btn btn-block light-rounded tc"
+															data-ng-click="openPage('home')">
+																<span class="icon-folder-open-alt"></span>
+														</button>
+
+													</div>
+
+										</div>
+										-->
+
+									</div>
+
+								</div>
+
+							</div>
+							
+							<!-- MAIN SITEMAP/OPTIONS -->
+							<div data-ng-cloak class="anim8-page main" data-ng-switch-when="dashboard">
+
+								<div class="container body" data-ng-switch on="renderPath[ 1 ]">
+									
+									<!-- DASHBOARD -->
+									<div class="anim8-page dashboard-page-home" data-ng-switch-when="home">
+
+										<div class="row tile-content">
+											<br /><br />
+											<div data-ui-sitemap></div>
+
+										</div>
+
+									</div>
+
+									<!-- FREQUENTLY ASKED QUESTIONS -->
+									<div class="anim8-page dashboard-page-faq" data-ng-switch-when="faq">
+
+										<div data-ui-faq></div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+							<!-- INDEX -->
+							<div data-ng-cloak class="anim8-page anim8-page-login main" data-ng-switch-when="login">
+
+								<div class="container body">
+									
+									<div class="row tile-content">
+
+										<tour 
+											step="currentStep">
+
+											<br /><br /><br /><br />
+
+											<h1 class="FiraFont tc" style="font-size:2em;text-shadow: 0 1px 0 #fff;">
+												Welcome to the Phola Coal HSE
+											</h1>
+
+											<br /><br /><br /><br /><br />
+
+											<div data-ui-form-login></div>
+
+											<!-- WORKING HSE INTRO FOR CLIENTS
+
+											<div 
+												class="alert alert-block alert-info tc FiraFont" 
+												style="width:60%;margin:1em auto;" 
+												data-ng-show="networkPaths.length == 0">
+
+													<p 
+														style="font-size:2em;line-height:2.5em;">
+															It appears the network location is not available or has been misconfigured.<br />Please contact the System Administrator.
+													</p>
+													<br />
+													<a 
+														href="javascript:;" 
+														class="btn btn-large macdaddy-rounded uppercase" 
+														style="display:inline-block;border-radius:999px;padding:1em 2em;"
+														data-ng-click="openPage('settings')" data-title="Settings">Configure
+													</a>
+													<br /><br />
+											</div>
+											<div id="mainEntry" class="row tc" style="position:relative;" data-ng-hide="networkPaths.length == 0">
+												
+												<span 
+													style=""
+													on-proceed="tourStepComplete()"
+													tourtip-element=".menu-trigger"
+													tourtip-container-element="#mainEntry"
+													tourtip-step="0"
+													tourtip-backDrop = "true"
+													tourtip-placement="left"
+													tourtip-next-label="Next"
+													tourtip-offset-vertical="10"
+    												tourtip-offset-horizontal="26"
+													tourtip="Click / Tap on the Green Button to view the option screen."></span>
+												
+												<button 
+													type="button" 
+													id="trigger" 
+													class="FiraFont menu-trigger btn btn-large btn-success btn-block uppercase" 
+													data-ng-click="goToHome()" style="font-size:4em; width:50%;">Open</button>
+												
+											</div>
+											-->
+											
+											<br /><br />
+
+										</tour>
+
+									</div>						
+								</div>
+
+							</div>
+
+							<!-- SPLASH -->
+							<div class="anim8-page" data-ng-switch-when="splash">
+								<div id="pagetransition" class="loading tc" role="presentation">
+									<br /><br />
+									<div class="spinner" style="display:block;"><br /><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><br /><br /></div>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+			</section>
+			<!-- [/MAIN SECTION] -->
+
+		<!-- <div data-ui-keyboard data-ng-cloak></div> -->
+
+		<script type="text/ng-template" id="aboutHSE">
+						
+			<div class="row">
+				<div class="columns sixteen">
+					<div data-ui-modal-about></div>
+				</div>
+			</div>
+
+		</script>
+
+		<script async id="htmlContent/tour.tpl.html" type="text/ng-template">
+			<div class="tour-tip">
+				<span class="tour-arrow tt-{{ placement }}"></span>
+				<div class="tour-content-wrapper">
+					<p ng-bind="content"></p>
+					<a ng-click="nextAction()" ng-bind="nextLabel" class="small btn btn-large btn-info FiraFont tour-next-tip"></a>
+					<a ng-click="closeAction()" class="tour-close-tip">�</a>
+				</div>
+			</div>  
+		</script>
+
+		<!-- build:js scripts/main.js -->
+		<script async data-main="init" src="thirdparty/require.min.js"></script>
+		<!-- endbuild -->
+
+	</body>
+</html>

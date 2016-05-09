@@ -1,0 +1,175 @@
+					<div class="row">
+						<div class="columns twelve" >
+							<h3 class="FiraFont uppercase mask-money"><strong>Notifications</strong>&nbsp;<span class="badge badge-success">{{hse_notifications.length}}</span></h3>
+							<br />							
+
+						</div>
+						<div class="columns three"></div>
+					</div>
+
+					<br /><br />
+
+					<div class="row">
+						
+						<div class="columns four">
+							<div id="filter-department" data-ui-filter-data>
+								<span class="anchor macdaddy-rounded">Show all Departments</span>
+								<ul class="unstyled items">
+									<li bindonce data-ng-repeat="db in hse_data.department" class="mask-money tl uppercase">
+										<div class="row">
+											<div class="columns two">
+												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="department" />
+											</div>
+											<div class="columns fourteen">
+												<span bo-text="db.Name"></span>&nbsp;()
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!-- -->
+						<div class="columns four">
+							<div id="filter-occupation" data-ui-filter-data data-ng-if="search_results == false">
+								<span class="anchor macdaddy-rounded">Show all Occupations</span>
+								<ul class="unstyled items">
+									<li bindonce data-ng-repeat="db in hse_data.occupation" class="mask-money tl uppercase">
+										<div class="row">
+											<div class="columns two">
+												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="occupation" />
+											</div>
+											<div class="columns fourteen">
+												<span bo-text="db.Name"></span>&nbsp;()
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!---->
+						<div class="columns four">
+							<div class="columns sixteen" data-ng-if="search_results == true">
+								<button type="button" class="btn btn-large btn-info macdaddy-rounded uppercase mask-money" data-ng-click="resetSearch()" style="padding: 1em;">Clear Search</button>
+							</div>
+
+							<div data-ng-if="search_results == false">
+										
+								<angucomplete-alt id="quick-search-notification"
+									placeholder="Search..."
+									text-searching="Searching Notifications..."
+									text-no-results="No Notifications Found"
+									pause="100"
+									selected-object="search"
+									local-data="hse_notifications"
+									search-fields="firstName,lastName,idNumber"
+									title-field="employeeName"
+									description-field = "dateName"
+									minlength="3"
+									clear-selected="true"
+									match-class="alert-success"
+									input-class="form-control form-control-small input-xlarge search-query" />
+
+							</div>
+						</div>
+						<div class="columns four tr">
+							<div class="btn-group fr">
+								<!--
+								<button type="button" data-ng-click="export( 'equipment', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+									<span class="icon-file-pdf alert-error"></span>
+								</button>
+								<button type="button" data-ng-click="export( 'equipment', 'csv' )" class="btn btn-large" data-title="Export Excel">
+									<span class="icon-file-excel alert-success"></span>
+								</button>
+								-->
+								<button 
+									type="button" 
+									data-ng-click="refreshData()"
+									class="btn dataRefresher refresh-data-employees full-rounded fr" >
+										<span class="icon-loop alert-info" title="Refresh Data"></span>
+								</button>
+							</div>
+						</div>
+						
+					</div>
+										
+					<br /><br />
+					
+					<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_notifications.length <= 0">
+						<p class="FiraFont">There are no notifications at the moment for Expiring Dates.</p>
+					</div>					
+
+					<table id="notifications-expired" class="table footable hoverable" data-ng-if="hse_notifications.length > 0">
+						<thead>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th style="width:50px;">
+									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
+										<span class="icon-checkmark3 alert-success"></span>
+									</button>
+								</th>
+								<th class="tc" colspan="7">Notification Details</th>
+								<th colspan="2">Message</th>
+							</tr>
+							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+								<th colspan="1"></th>
+								<th class="sortable tc" style="border-top:1px solid #ddd;" data-sid="status" data-ng-click="setSortExpression('status')">Status</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="notificationDate" data-ng-click="setSortExpression('notificationDate')">Notification Date</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="employeeName" data-ng-click="setSortExpression('employeeName')" colspan="1">Employee</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="equipmentName" data-ng-click="setSortExpression('equipmentName')">Equipment</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="supervisorName" data-ng-click="setSortExpression('supervisorName')">Supervisor</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="dateName" data-ng-click="setSortExpression('dateName')">Date Name</th>
+								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="dateName" data-ng-click="setSortExpression('dateName')">Date Value</th>
+								<th colspan="2" style="border-top:1px solid #ddd;"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tl" bindonce data-ng-repeat="data in hse_notifications | paginate:50 track by data.ID">
+								
+								<td class="mask-money tc" style="width:50px;">
+									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
+								</td>
+								<td class="mask-money tc">
+									<span 
+										class="icon-circle"
+										data-ng-class="{ 'alert-info': data.status == '3', 'alert-error': data.status == '0', 'alert-success': data.status == '1'}" >
+									</span>
+								</td>
+								<td class="mask-money uppercase" bo-text="data.notificationDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="mask-money uppercase" bo-text="data.employeeName"></td>
+								<td class="mask-money uppercase" bo-text="data.equipmentName"></td>
+								<td class="mask-money uppercase" bo-text="data.supervisorName"></td>
+								<td class="mask-money" bo-text="data.dateName"></td>
+								<td class="mask-money" bo-text="data.dateValue | date: 'yyyy-MMM-dd'"></td>
+								<td class="mask-money" colspan="2" bo-text="data.message"></td>
+		
+							</tr>
+						</tbody>
+						<tfoot class="footable-pagination tc">
+							<tr>
+								<td class="tc"colspan="3">
+									<!-- -->
+									<select 
+										id="batchActions-linked-cards" 
+										disabled
+										data-ng-model="batch_actions"
+										data-ng-change="batchActions()">
+											<option value="">Action&hellip;</option>
+											<option value="balance">Mark as sent</option>
+											<option value="balance">Resend</option>
+											<option value="statement">Delete</option>
+									</select>
+									<!-- -->
+								</td>
+								<td colspan="6"><paginator></paginator></td>
+							</tr>
+						</tfoot>
+					
+					</table>
+
+					<script type="text/ng-template" id="equipmentActions">
+						<div data-ui-modal-notifications-actions></div>
+					</script>
+					<!--
+					<script type="text/ng-template" id="editEquipmentInline">
+						<div data-ui-form-edit-equipment></div>
+					</script>
+					-->

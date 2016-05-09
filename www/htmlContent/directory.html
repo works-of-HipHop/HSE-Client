@@ -1,0 +1,198 @@
+			<div class="mp-pusher mp-on" id="mp-pusher">
+				<!-- mp-menu -->
+				<nav id="mp-menu" class="mp-menu">
+					<tour 
+						step="currentStep">	
+					
+							<div class="mp-level">
+								<br /><br />
+
+								<div id ="crumbs" class="row">
+									<div class="columns sixteen">
+										<ul class="unstyled breadcrumb uppercase FiraFont ini">
+											<li class="fl home-root">
+												<a href="javascript:;" data-ng-click="goToHome()">
+													<span class="icon-home"></span>
+												</a>
+											</li>
+											<li data-ng-class="{ 'home-root': bcrumb.isRoot == true }" class="fl" bindonce data-ng-repeat="bcrumb in breadCrumbs" data-ng-if="bcrumb.isBCrumbRoot == true" data-ng-hide="$index == 0">
+												<a href="javascript:;" data-ng-if="bcrumb.isRoot == false" data-ng-click="openDir( $event, bcrumb.path )">
+													{{bcrumb.Name}}
+												</a>
+											</li>
+										</ul>
+										<span 
+											style=""
+											on-proceed="tourStepComplete()"
+											tourtip-container-element="#crumbs"
+											tourtip-step="0"
+											tourtip-backDrop = "true"
+											tourtip-placement="right"
+											tourtip-next-label="Next"
+											tourtip-offset-vertical="0"
+		    								tourtip-offset-horizontal="300"
+											tourtip="These links are a quick way to navigate through folders. Click / Tap on the name to display the contents of that folder."></span>
+									</div>
+								</div>
+
+								<div class="row search-div" style="padding-top:3em;margin-left:10em;">
+
+									<div class="" data-ng-show="searchResults == true">
+										<button type="button" class="btn btn-block FiraFont macdaddy-rounded" style="padding:1em;font-size:1.8em;" data-ng-click="clearSearch()">
+											Clear Search
+										</button>
+									</div>
+
+									<div class="input-append" style="width:90%;font-size:1em;" data-ng-hide="searchResults == true">
+										<input 
+											type="search"
+											placeholder="Search {{breadCrumbs[(breadCrumbs.length - 1)].Name}} for..."
+											class="mp-search search-query FiraFont"
+											data-ng-model="quickSearch"
+											data-ui-touch-input />
+										<button
+											type="button"
+											style="border-radius:0 999px 999px 0;padding: 0.9em 1.35em;letter-spacing: 3px;font-size: 1.4em;background-color: #50C01C;border: 1px solid #0CA218;color: #fff;text-shadow: none;left: -4px;position: relative;"
+											data-ng-click="search()"
+											class="btn FiraFont add-on">Search</button>
+
+									</div>
+									
+								</div>
+								<br />
+								<!-- <ul id="dtree_roots" class="file-list" data-hm-Pinch-In="goToHome()"></ul> -->
+								<!--
+								<hr class="folderResults" />					
+								<br />
+								-->
+								<br />
+								
+								<div id="floating-turd" class="row" style="position:relative;padding: 1em;padding-top:4em;border-top: 1px solid #ddd;background-color: rgba(255,255,255,0.4);">
+								
+									<div class="row tl" style="padding-left:10em;">
+										<div class="columns eight">
+											<h1 class="FiraFont Folder_Item_Count" style="padding-left:1.3em;" data-ng-if="activeFolder.length > 0">
+												Showing (<strong>{{activeFolder.length}}</strong>)
+											</h1>
+											
+											<h1 class="FiraFont Folder_Item_Count tc alert alert-block alert-info" style="padding:1.3em;width:200%;" data-ng-if="activeFolder.length == 0">Folder is Empty</h1>
+
+											<div style="margin-top:1.5em;padding-left:2.5em;">
+												<h4 class="FiraFont Uppercase folderStat uppercase" data-ng-if="activeFolder.length > 0">Total Folders: <span class="badge badge-success tr mask-money">{{total_folders_found}}</span> | Total Files: <span class="badge badge-success tr mask-money">{{total_files_found}}</span></h4>
+											</div>
+										</div>
+										<div class="columns eight tr" style="padding-right:10em;">
+											<div class="row" data-ng-show="activeFolder" data-ng-hide="searchResults == true">
+												<div class="columns eight tr">
+													<label class="switch" data-ng-class="{ 'off': total_files_found <= 0 }" data-ng-hide="total_files_found == 0 || total_folders_found == 0">
+														<label for="files_only" class="tr FiraFont" style="font-size:1.5em;"><Strong>Show Files Only?</strong></label><br />
+														<input 
+															type="checkbox" 
+															name="files_only" 
+															data-ng-change="filtration('files_only')"
+															data-ng-model="activeFolderFilter.files_only" 
+															data-ng-checked="activeFolderFilter.files_only == true" /><i title="Show Files Only?"></i>
+													</label>
+												</div>
+												<div class="columns eight tr">
+													<label class="switch" data-ng-class="{ 'off': total_folders_found <= 0 }"  data-ng-hide="total_folders_found == 0 || total_files_found == 0">
+														<label for="folders_only" class="tr FiraFont" style="font-size:1.5em;"><Strong>Show Folders Only?</strong></label><br />
+														<input 
+															type="checkbox"
+															name="folders_only"
+															data-ng-change="filtration('folders_only')"
+															data-ng-model="activeFolderFilter.folders_only" 
+															data-ng-checked="activeFolderFilter.folders_only == true" /><i title="Show Folders Only?"></i>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="columns five"></div>
+									</div>
+									
+									<br /><br />
+									
+									<span 
+										style=""
+										on-proceed="tourStepComplete()"
+										tourtip-container-element="#floating-turd"
+										tourtip-step="1"
+										tourtip-backDrop = "true"
+										tourtip-placement="top"
+										tourtip-next-label="Open a Folder"
+										tourtip-offset-vertical="50"
+		    							tourtip-offset-horizontal="600"
+										tourtip="This is a list of Folders and / or Documents that are currently available.  Click on a folder to display its content or click on a PDF to preview it."></span>
+
+									<span 
+										style=""
+										on-proceed="tourStepComplete()"
+										tourtip-container-element="#floating-turd"
+										tourtip-step="2"
+										tourtip-backDrop = "true"
+										tourtip-placement="top"
+										tourtip-next-label="Preview a File"
+										tourtip-offset-vertical="140"
+		    							tourtip-offset-horizontal="650"
+										tourtip="Clicking on a red button will open the file &amp; allow you to see its content."></span>
+
+									<div class="row" style="padding-left:10em;">
+
+										<div class="columns sixteen">
+											
+											<ul class="folderList unstyled">
+												<!--
+												<li class="paging" data-ng-if="activeFolder.length > 0">
+													<br />
+													<data-paginator></data-paginator>
+													<br />
+												</li> -->
+												<li data-path="{{dbFolder.path}}" data-ng-class="{ 'alert-success folder-li': dbFolder.isFolder == true, 'alert-error': dbFolder.isFolder == false, 'file-pdf': dbFolder.ext == 'pdf', 'file-doc': dbFolder.ext == 'doc' }" bindonce data-ng-repeat="dbFolder in activeFolder | paginate:40">
+													<button
+														type="button"
+														data-ng-if="dbFolder.isFolder == true"
+														class="btn btn-block tl FiraFont"
+														data-ng-click="openDir($event, dbFolder.path)">
+															<span bo-text="dbFolder.name"></span>
+													</button>
+													<button
+														type="button"
+														data-ng-if="dbFolder.isFolder == false"
+														
+														class="btn btn-block tl FiraFont"
+														data-ng-click="previewFile( dbFolder.ext, dbFolder.path )">
+															<span bo-text="dbFolder.name"></span>
+													</button>
+												</li>
+												<li class="empty-folder" style="border:none !important;" data-ng-if="activeFolder.length == 0">
+													<br /><br />
+													<!--<button type="button" class="btn btn-block FiraFont">Go Back</button> -->
+													<br /><br />
+												</li>
+												<li class="paging" data-ng-if="activeFolder.length > 0">
+													<data-paginator></data-paginator>
+													<br />
+												</li>
+												<!--
+												<li class="paging" data-ng-if="activeFolder.length <= 0">
+													<h3 class="tc FiraFont">Folder is Empty</h3>
+													<br />
+												</li> -->
+												<br /><br />
+												<div class="spinner tc" data-ng-if="!activeFolder" data-ng-hide="activeFolder.length <= 0" style="display:block;padding:2em;">
+													<br /><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><br /><br />
+												</div>
+											</ul>
+											<br />
+										</div>
+										
+									</div>
+
+								</div>
+
+							</div>
+					
+					</tour>
+				</nav>
+				<!-- /mp-menu -->
+			</div>
