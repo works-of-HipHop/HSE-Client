@@ -57,13 +57,13 @@
      * @type MySQL Server
      */
 	var _mysqlServer = null,
-		/** LIVE ** /
+		/** LIVE **/
 		_SQL_host 		= '192.168.17.50',
 		_SQL_port 		= 3306,
 		_SQL_user 		= 'MyHSE',
 		_SQL_pword 		= 'BXDFsHR',
 		_SQL_dbname		= 'phse',
-		/**/
+		/** /
     	_SQL_host 		= '197.189.253.71',
 		_SQL_port 		= 3306,
 		_SQL_user 		= 'fdstudio_phola',

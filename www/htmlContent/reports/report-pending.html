@@ -21,10 +21,10 @@
 							text-no-results="No Employees Found"
 							pause="100"
 							selected-object="search"
-							local-data="metaTarsals"
-							search-fields="idNumber,firstName,lastName,employeeNumber"
-							title-field="displayName"
-							description-field = "idNumber"
+							local-data="orangeEmployees"
+							search-fields="employeeName,equipmentName,departmentName"
+							title-field="employeeName"
+							description-field = "equipmentName"
 							minlength="3"
 							clear-selected="true"
 							match-class="alert-success"
@@ -120,7 +120,7 @@
 					</tr>
 				</thead>
 				<tbody >
-					<tr class="tl" bindonce data-ng-repeat="(key, value) in metaTarsals track by $index">
+					<tr class="tl" bindonce data-ng-repeat="(key, value) in orangeEmployees track by $index">
 					
 						<td class="mask-money tc" style="width:50px;">
 							<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{$index}}" />

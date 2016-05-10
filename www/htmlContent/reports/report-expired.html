@@ -20,10 +20,10 @@
 							text-no-results="No Employees Found"
 							pause="100"
 							selected-object="search"
-							local-data="metaTarsals"
-							search-fields="idNumber,firstName,lastName,employeeNumber"
-							title-field="displayName"
-							description-field = "idNumber"
+							local-data="redEmployees"
+							search-fields="employeeName,equipmentName,departmentName"
+							title-field="employeeName"
+							description-field = "equipmentName"
 							minlength="3"
 							clear-selected="true"
 							match-class="alert-success"
@@ -94,10 +94,10 @@
 					
 			<br /><br />
 					
-			<div class="alert alert-block alert-info FiraFont tc" data-ng-if="metaTarsals.length <= 0">
+			<div class="alert alert-block alert-info FiraFont tc" data-ng-if="redEmployees.length <= 0">
 				<p class="FiraFont">There are no Employees with expired dates at the moment.</p>
 			</div>
-			<table id="report-expired" class="table footable hoverable" data-ng-if="metaTarsals.length > 0">
+			<table id="report-expired" class="table footable hoverable" data-ng-if="redEmployees.length > 0">
 																				
 				<thead>
 					<tr class="tl uppercase mask-money" style="cursor:pointer;">
@@ -113,7 +113,7 @@
 					</tr>
 				</thead>
 				<tbody >
-					<tr class="tl" bindonce data-ng-repeat="(key, value) in metaTarsals track by $index">
+					<tr class="tl" bindonce data-ng-repeat="(key, value) in redEmployees track by $index">
 					
 						<td class="mask-money tc" style="width:50px;">
 							<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{$index}}" />
