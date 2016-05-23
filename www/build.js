@@ -1,7 +1,5 @@
 ({
 	paths: {
-		//"app": 						'production/app-min',
-		"app": 						'app',
 		"AppConstants": 			'base-config/config',
 		"md5hash": 					'utils/md5hash',
 		"nodeConnection":       	'utils/NodeConnection',
@@ -9,29 +7,27 @@
 		"i18n": 					'thirdparty/i18n/i18n',
 		'CommandHandlers': 			'command/CommandHandlers',
 		'HelpCommandHandlers': 		'command/HelpCommandHandlers',
-		"window":       			'public/scripts/modules/window',
-		"document":     			'public/scripts/modules/document',
+		"window":       			'utils/window',
+		"document":     			'utils/document',
 		"pathUtils":				'thirdparty/path-utils/path-utils.min',
 		'localforage': 				'thirdparty/localforage.min',
 		"Utils": 					'thirdparty/Utils',
 		//angular
-		"angular": 					'thirdparty/angular.1.2',
-		"angulartics": 				'thirdparty/angulartics/angulartics.min',
-		"angulartics-ga": 			'thirdparty/angulartics/angulartics-ga.min',
+		//"angular": 					'thirdparty/angular.1.2',
+		"angular": 					'thirdparty/angular.1.2.1.min',
 		"angular-animate": 			'thirdparty/plugins/angular/angular-animate.min',
-		"angular-ping": 			'thirdparty/plugins/angular/angular-ping.min',
 		"angular-route": 			'thirdparty/plugins/angular/angular-route.min',
 		"angular-filter": 			'thirdparty/plugins/angular/angular-filter.min',
 		"angular-touch": 			'thirdparty/plugins/angular/angular-touch.min',
 		"angular-gestures": 		'thirdparty/plugins/angular/gestures.min',
 		"angular-tour-html":		'thirdparty/plugins/angular/angular-tour-tpls.min',
-		"angular-walkthrough":		'thirdparty/plugins/angular/ng-walkthrough',
 		"angular-dialog": 			'thirdparty/plugins/angular/ngDialog.min',
 		"angular-accordion":		'thirdparty/plugins/angular/ang-accordion',
 		"autocomplete": 			'thirdparty/plugins/angular/angucomplete-alt',
 		"angular-progress": 		'thirdparty/plugins/angular/ngProgress.min',
 		"angular-batch-http": 		'thirdparty/plugins/angular/angular-http-batch.min',
 		"bindonce": 				'thirdparty/plugins/angular/bindonce.min',
+		"angular-pagination": 		'thirdparty/plugins/angular/angular-utils-pagination/dirPagination',
 		"angular-file-upload": 			'thirdparty/plugins/angular/file-upload/angular-file-upload.min',
 		"angular-file-upload-shim": 	'thirdparty/plugins/angular/file-upload/angular-file-upload-html5-shim.min',
 		"angular-file-upload-fileAPI": 	'thirdparty/plugins/angular/file-upload/FileAPI.min',
@@ -62,7 +58,7 @@
 		"pdf_metadata":				'thirdparty/pdfJS/lib/display/metadata',
 		"pdf_canvas":				'thirdparty/pdfJS/lib/display/canvas',
 		"pdf_font_loader":			'thirdparty/pdfJS/lib/display/font_loader',
-		"pdf_compatibility":		'thirdparty/pdfViewer/compatibility',
+		//"pdf_compatibility":		'thirdparty/pdfViewer/compatibility',
 		//jQuery Plugins
 		"jquery": 					'thirdparty/jquery-2.0.1.min',
 		"noti5y": 					'thirdparty/noti5y'
@@ -134,6 +130,9 @@
 		'angular-gestures': {
 			deps: ["angular"]
 		},
+		'angular-pagination': {
+			deps: ["angular"]
+		},
 		'autocomplete': {
 			deps: ["angular"]
 		},
@@ -144,9 +143,6 @@
 			deps: ["angular"],
 		},
 		'angular-tour-html': {
-			deps: ["angular"],
-		},
-		'angular-walkthrough': {
 			deps: ["angular"],
 		},
 		'angular-progress': {

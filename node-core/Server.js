@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved.
+ * Copyright (c) 1988 - Present @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"), 
@@ -21,10 +21,6 @@
  * 
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4,
-maxerr: 50, node: true */
-/*global */
-
 (function () {
 	
 	"use strict";
@@ -37,8 +33,6 @@ maxerr: 50, node: true */
     
 	var fs 					= require("fs"),
 		http 				= require("http"),
-		//mysql      			= require('./thirdparty/mysql'),
-		//DBMine 				= require("./QDb"),
 		WebSocket 			= require("./thirdparty/ws"),
 		EventEmitter 		= require("events").EventEmitter,
 		Logger				= require("./Logger"),
@@ -68,28 +62,6 @@ maxerr: 50, node: true */
      */
 	var _httpServer = null;
 
-	/**
-     * @private
-     * @type{http.Server} the MySQL server
-     * /
-	var _mysqlServer = null,
-    	_SQL_host 		= '197.189.253.71',//'www.prepetrol.co.za',//
-		_SQL_port 		= 3306,
-		_SQL_user 		= 'fdstudio_phola',//'prepetro@localhost',
-		_SQL_pword 		= 'z^BN+Xh,Z3[S',
-		_SQL_dbname		= 'fdstudio_hse',
-		_SQL_db_config 	= {
-			//socketPath: address.port,
-			host     			: _SQL_host,
-			user     			: _SQL_user,
-			password 			: _SQL_pword,
-			database 			: _SQL_dbname,
-			debug 				: true,
-			multipleStatements 	: true,
-			insecureAuth 		: true
-			//stringifyObjects	: true
-		};
-
     /**
      * @private
      * @type{ws.WebSocketServer} the WebSocket server
@@ -97,21 +69,6 @@ maxerr: 50, node: true */
 	var _wsServer = null;
 	var _user = null;
 
-	/**
-     * @private
-     * @type smtp transport
-     * /
-  	var smtp,
-  		smtp_config = {
-  			host: 'mail.5ivedesign.co.za',
-  			secureConnection: false,
-  			port: 587, // 465 // for secure port,
-  			auth: {
-  				user: 'spidermonkey@5ivedesign.co.za',
-  				pass: 'or%%@1c&WhV5'
-  			}
-  		};
-	
 	/**
      * @private
      * 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
+ * Copyright (c) 1988 - Present @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"), 
@@ -197,32 +197,53 @@
 
 		//var columns = [ 'ID', 'user_login', 'user_pass', 'user_email', 'display_name' ];
 
-		// Make the database query
-		var query = _mysqlServer.query( 'SELECT * FROM admin_users WHERE user_email = ? AND user_pass = ?', [ credentials.username, credentials.password ], function( err, result ) {
+		try {
 
-			if( err ) {
+			_mysqlServer.getConnection( function(err, connection) {
+						
+				if( err ) {
 
-				callback( err );
+					callback( err.code );
 
-			} else {
-
-				//if( !angular.isDefined(result) || result.length < 1 ) {
-				if( result.length < 1 ) {
-
-					callback( 'Username: ' + credentials.username + ' not found.' );
+					// And done with the connection, it has been returned to the pool.
+					connection.release();
 
 				} else {
 
-					callback( false, result[0] );
+					connection.query( 'SELECT * FROM admin_users WHERE user_email = ? AND user_pass = ?', [ credentials.username, credentials.password ], function( err, result ) {
+
+						if( err ) {
+
+							callback( err.code );
+
+						} else {
+
+							if( result.length < 1 ) {
+
+								callback( 'Username: ' + credentials.username + ' not found.' );
+
+							} else {
+
+								callback( false, result[0] );
+
+							}
+						
+						};
+
+						// And done with the connection, it has been returned to the pool.
+						connection.release();
+
+					});
 
 				}
-			
-			};
 
-			//loginDetails = null;
-			//columns = null;
+			});
 
-		});
+		} catch( e ) {
+
+			callback( e );
+
+		}
 	
 	}
 
@@ -244,674 +265,669 @@
 			result 	= [],
 			data 	= {};
 
-		/**/
-		switch( options.type ) {
+		try {
 
-			case 'configuration':
-
-				var	Data_networkPaths		= [],
-					Data_appOptions 		= [],
-					Data_additionalPaths	= [];
-
-				var _networkPaths 		= "SELECT networkPaths.* FROM networkPaths ORDER BY ID ASC",
-					//_additionalPaths 	= "SELECT additionalPaths.*, networkPaths.Name as rootName, networkPaths.Value as rootPath FROM additionalPaths INNER JOIN networkPaths ON additionalPaths.networkPathID = networkPaths.ID ORDER BY additionalPaths.ID ASC",
-					_additionalPaths 	= "SELECT additionalPaths.* FROM additionalPaths ORDER BY ID ASC",
-					_appOptions 		= "SELECT options.* FROM options ORDER BY ID ASC";
-
-				query = _mysqlServer.query( _networkPaths + ";" + _additionalPaths + ";" + _appOptions );
-
-				query
-					.on( 'error', function(err) {
+			_mysqlServer.getConnection( function(err, connection) {
 						
-						//result.push( err );
+				if( err ) {
 
-						callback( err );
-						// Handle error, an 'end' event will be emitted after this as well
-					})
-					.on( 'fields', function(fields) {
-						
-						// the field packets for the rows to follow
-					})
-					.on( 'result', function( row, index ) {
+					callback( err.code );
 
-						switch ( index ) {
+				} else {
 
-							case 0:
+					switch( options.type ) {
 
-								Data_networkPaths.push( row );
+						case 'configuration':
 
-								break;
+							var	Data_networkPaths		= [],
+								Data_appOptions 		= [],
+								Data_additionalPaths	= [];
 
-							case 1:								
+							var _networkPaths 		= "SELECT networkPaths.* FROM networkPaths ORDER BY ID ASC",
+								//_additionalPaths 	= "SELECT additionalPaths.*, networkPaths.Name as rootName, networkPaths.Value as rootPath FROM additionalPaths INNER JOIN networkPaths ON additionalPaths.networkPathID = networkPaths.ID ORDER BY additionalPaths.ID ASC",
+								_additionalPaths 	= "SELECT additionalPaths.* FROM additionalPaths ORDER BY ID ASC",
+								_appOptions 		= "SELECT options.* FROM options ORDER BY ID ASC";
 
-								Data_additionalPaths.push( row );
+							query = connection.query( _networkPaths + ";" + _additionalPaths + ";" + _appOptions );
 
-								break;
+							query
+								.on( 'error', function(err) {
+									
+									//result.push( err );
 
-							case 2:
+									callback( err );
+									// Handle error, an 'end' event will be emitted after this as well
 
-								Data_appOptions.push( row );
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-								break;
+								})
+								.on( 'fields', function(fields) {
+									
+									// the field packets for the rows to follow
+								})
+								.on( 'result', function( row, index ) {
 
-						};
+									switch ( index ) {
 
-					})
-					.on( 'end', function() {
+										case 0:
 
-						callback( false, {
-							'networkPaths'		: Data_networkPaths,
-							'appOptions'		: Data_appOptions,
-							'additionalPaths'	: Data_additionalPaths
-						});
+											Data_networkPaths.push( row );
 
-					});
+											break;
 
-				break;
+										case 1:								
 
-			case 'employees':
+											Data_additionalPaths.push( row );
 
-				var	Data_users 				= [],
-					Data_userMeta 			= [],
-					Data_supervisors 		= [];
+											break;
 
-				var //_users 				= "SELECT users.* FROM users ORDER BY lastName ASC",
-					_users 				= "SELECT users.*, userType.Name as userTypeName, occupation.Name as userOccupation, department.Name as departmentName FROM users INNER JOIN userType ON users.userTypeID = userType.ID LEFT JOIN occupation ON users.occupationID = occupation.ID LEFT JOIN department ON users.departmentID = department.ID ORDER BY users.lastName ASC",
-					// GOOD: _users 				= "SELECT users.*, userType.Name as userTypeName FROM users INNER JOIN userType ON users.userTypeID = userType.ID ORDER BY lastName ASC",
-					_userMeta 			= "SELECT usersMeta.*, dates.Name as dateName FROM usersMeta INNER JOIN dates ON usersMeta.dateID = dates.ID ORDER BY userID ASC",
-					_supervisors 		= "SELECT supervisors.* FROM supervisors ORDER BY userID ASC";
+										case 2:
 
-				query = _mysqlServer.query( _users + ";" + _userMeta + ";" + _supervisors );
-				query
-					.on( 'error', function(err) {
-						
-						//result.push( err );
+											Data_appOptions.push( row );
 
-						callback( err.code );
-						// Handle error, an 'end' event will be emitted after this as well
-					})
-					.on( 'fields', function(fields) {
-						
-						// the field packets for the rows to follow
-					})
-					.on( 'result', function( row, index ) {
+											break;
 
-						switch ( index ) {
+									};
 
-							case 0:
+								})
+								.on( 'end', function() {
 
-								if( row.userOccupation == null ) {
-									row.userOccupation = 'N/A';
-								};
-								if( row.departmentName == null ) {
-									row.departmentName = 'N/A';
-								};
+									callback( false, {
+										'networkPaths'		: Data_networkPaths,
+										'appOptions'		: Data_appOptions,
+										'additionalPaths'	: Data_additionalPaths
+									});
 
-								if( row.employeeNumber == null || row.employeeNumber == "" ) {
-									row.employeeNumber = 'N/A';
-								};
-								if( row.idNumber == null || row.idNumber == "" ) {
-									row.idNumber = 'N/A';
-								};
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-								if( row.emailAddress == null || row.emailAddress == "" ) {
-									row.emailAddress == "N/A";//row.firstName + '.' row.lastName + '@minopex.co.za';
-								};
+								});
 
-								Data_users.push( row );
+							break;
 
-								break;
+						case 'employees':
 
-							case 1:
+							var	Data_users 				= [],
+								Data_userMeta 			= [],
+								Data_supervisors 		= [];
 
-								/** /
-								switch( row.dateID ) {
+							var //_users 				= "SELECT users.* FROM users ORDER BY lastName ASC",
+								_users 				= "SELECT users.*, userType.Name as userTypeName, occupation.Name as userOccupation, department.Name as departmentName FROM users INNER JOIN userType ON users.userTypeID = userType.ID LEFT JOIN occupation ON users.occupationID = occupation.ID LEFT JOIN department ON users.departmentID = department.ID ORDER BY users.lastName ASC",
+								// GOOD: _users 				= "SELECT users.*, userType.Name as userTypeName FROM users INNER JOIN userType ON users.userTypeID = userType.ID ORDER BY lastName ASC",
+								_userMeta 			= "SELECT usersMeta.*, dates.Name as dateName FROM usersMeta INNER JOIN dates ON usersMeta.dateID = dates.ID ORDER BY userID ASC",
+								_supervisors 		= "SELECT supervisors.* FROM supervisors ORDER BY userID ASC";
 
-									case 1:
+							query = connection.query( _users + ";" + _userMeta + ";" + _supervisors );
+							query
+								.on( 'error', function(err) {
+									
+									//result.push( err );
 
-										break;
+									callback( err.code );
+									// Handle error, an 'end' event will be emitted after this as well
 
-									case 2:
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-										break;
+								})
+								.on( 'fields', function(fields) {
+									
+									// the field packets for the rows to follow
+								})
+								.on( 'result', function( row, index ) {
 
-									case 3:
+									switch ( index ) {
 
-										break;
+										case 0:
 
-								}/**/
+											if( row.userOccupation == null ) {
+												row.userOccupation = 'N/A';
+											};
+											if( row.departmentName == null ) {
+												row.departmentName = 'N/A';
+											};
 
-								Data_userMeta.push( row );
+											if( row.employeeNumber == null || row.employeeNumber == "" ) {
+												row.employeeNumber = 'N/A';
+											};
+											if( row.idNumber == null || row.idNumber == "" ) {
+												row.idNumber = 'N/A';
+											};
 
-								break;
+											if( row.emailAddress == null || row.emailAddress == "" ) {
+												row.emailAddress == "N/A";//row.firstName + '.' row.lastName + '@minopex.co.za';
+											};
 
-							case 2:
+											Data_users.push( row );
 
-								Data_supervisors.push( row );
+											break;
 
-								break;
+										case 1:
 
-						};
+											if( row.value == "0000-00-00 00:00:00" ) {
 
-					})
-					.on( 'end', function() {
+												row.value = "N/A";
 
-						// loop thru 
-						for (var i = 0; i < Data_users.length; i++) {
+											};
 
-							if( Data_users[i] ) {
+											/** /
+											switch( row.dateID ) {
 
-								Data_users[i].displayName = Data_users[i].firstName + ' ' + Data_users[i].lastName;
+												case 1:
 
-								Data_users[i].meta = [];
+													break;
 
-								for (var j = 0; j < Data_userMeta.length; j++) {
+												case 2:
 
-									if( Data_users[i].ID == Data_userMeta[j].userID ) {
+													break;
 
-										// go through meta now...checking for exising equipment meta data
-										if( Data_users[i].meta.length > 0 ) {
+												case 3:
 
-											var added = false;
-											
-											for (var k = 0; k < Data_users[i].meta.length; k++) {
+													break;
 
-												if( Data_users[i].meta[k].equipmentID == Data_userMeta[j].equipmentID ) {
+											}/**/
 
-													added = true;
+											Data_userMeta.push( row );
 
-													switch( parseInt(Data_userMeta[j].dateID) ) {
+											break;
 
-															case 1: // PTO Date
+										case 2:
 
-																Data_users[i].meta[k].PTODate = Data_userMeta[j].value
-																
-																break;
+											Data_supervisors.push( row );
 
-															case 2: // Certificate Date
+											break;
 
-																Data_users[i].meta[k].certificateDate = Data_userMeta[j].value
+									};
 
-																break;
+								})
+								.on( 'end', function() {
 
-															case 3: // Appointment Date
+									// loop thru 
+									for (var i = 0; i < Data_users.length; i++) {
 
-																Data_users[i].meta[k].appointmentDate = Data_userMeta[j].value
+										if( Data_users[i] ) {
 
-																break;
+											Data_users[i].displayName = Data_users[i].firstName + ' ' + Data_users[i].lastName;
+
+											Data_users[i].meta = [];
+
+											for (var j = 0; j < Data_userMeta.length; j++) {
+
+												if( Data_users[i].ID == Data_userMeta[j].userID ) {
+
+													// go through meta now...checking for exising equipment meta data
+													if( Data_users[i].meta.length > 0 ) {
+
+														var added = false;
+														
+														for (var k = 0; k < Data_users[i].meta.length; k++) {
+
+															if( Data_users[i].meta[k].equipmentID == Data_userMeta[j].equipmentID ) {
+
+																added = true;
+
+																switch( parseInt(Data_userMeta[j].dateID) ) {
+
+																		case 1: // PTO Date
+
+																			Data_users[i].meta[k].PTODate = Data_userMeta[j].value
+																			
+																			break;
+
+																		case 2: // Certificate Date
+
+																			Data_users[i].meta[k].certificateDate = Data_userMeta[j].value
+
+																			break;
+
+																		case 3: // Appointment Date
+
+																			Data_users[i].meta[k].appointmentDate = Data_userMeta[j].value
+
+																			break;
+
+																}
+
+															}
+
+														}
+
+														if( added === true ) {} else {
+
+															switch( parseInt(Data_userMeta[j].dateID) ) {
+
+																	case 1: // PTO Date
+
+																			Data_users[i].meta.push({
+																				'equipmentID' 	: Data_userMeta[j].equipmentID,
+																				'PTODate'		: Data_userMeta[j].value
+																			});
+
+																			break;
+
+																	case 2: // Certificate Date
+
+																			Data_users[i].meta.push({
+																				'equipmentID' 		: Data_userMeta[j].equipmentID,
+																				'certificateDate'	: Data_userMeta[j].value
+																			});
+
+																			break;
+
+																	case 3: // Appointment Date
+
+																			Data_users[i].meta.push({
+																				'equipmentID' 		: Data_userMeta[j].equipmentID,
+																				'appointmentDate'	: Data_userMeta[j].value
+																			});
+
+																			break;
+
+															}
+
+														}
+
+													} else {
+
+														switch( parseInt(Data_userMeta[j].dateID) ) {
+
+																case 1: // PTO Date
+
+																	Data_users[i].meta.push({
+																		//'dateID' 		: Data_userMeta[j].dateID,
+																		//'dateName'		: Data_userMeta[j].dateName,
+																		'equipmentID' 	: Data_userMeta[j].equipmentID,
+																		'PTODate'		: Data_userMeta[j].value
+																	});
+
+																	/** /
+																	Data_users[i].meta.push({
+																		'dateID' 		: Data_userMeta[j].dateID,
+																		//'dateName'		: Data_userMeta[j].dateName,
+																		'equipmentID' 	: Data_userMeta[j].equipmentID,
+																		'PTODate'		: Data_userMeta[j].value
+																	});/**/
+
+																	break;
+
+																case 2: // Certificate Date
+
+																	Data_users[i].meta.push({
+																		//'dateID' 			: Data_userMeta[j].dateID,
+																		//'dateName'			: Data_userMeta[j].dateName,
+																		'equipmentID' 		: Data_userMeta[j].equipmentID,
+																		'certificateDate'	: Data_userMeta[j].value
+																	});
+
+																	break;
+
+																case 3: // Appointment Date
+
+																	Data_users[i].meta.push({
+																		//'dateID' 			: Data_userMeta[j].dateID,
+																		//'dateName'			: Data_userMeta[j].dateName,
+																		'equipmentID' 		: Data_userMeta[j].equipmentID,
+																		'appointmentDate'	: Data_userMeta[j].value
+																	});
+
+																	break;
+
+														}
+
+													}
+
+													//Data_users[i].meta.push(Data_userMeta[j]);					
+
+												}
+
+											}
+
+										}
+
+									};
+
+									callback( false, {
+										'users'			: Data_users,
+										'userMeta'		: Data_userMeta,
+										'supervisors'	: Data_supervisors
+									});
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								});
+
+							break;
+
+						case 'notifications':
+
+							//callback('fuck!');
+							
+							var Data_notification			= [],
+								_notification 				= "SELECT notifications.ID, notifications.date AS notificationDate, notifications.employeeID, notifications.supervisorID, notifications.equipmentID, notifications.dateID, notifications.notificationTypeID, notifications.dateValue, notifications.status, notifications.message, users.firstName, users.lastName, users.idNumber, users.departmentID, users.occupationID, equipment.Name AS equipmentName, dates.Name AS dateName FROM notifications INNER JOIN users ON notifications.employeeID = users.ID INNER JOIN equipment ON notifications.equipmentID = equipment.ID INNER JOIN dates ON notifications.dateID = dates.ID ORDER BY notifications.date ASC";
+								//_notification 				= "SELECT notifications.* FROM notifications ORDER BY notifications.date ASC";
+							
+							query = connection.query( _notification );
+							query
+								.on( 'error', function(err) {
+									
+									//result.push( err );
+
+									callback( err.code );
+									// Handle error, an 'end' event will be emitted after this as well
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								})
+								.on( 'fields', function(fields) {
+									
+									// the field packets for the rows to follow
+								})
+								.on( 'result', function( row, index ) {
+
+									switch ( index ) {
+
+										case 0:
+
+											row.employeeName = row.firstName + ' ' + row.lastName;
+
+											Data_notification.push( row );
+
+											break;
+
+									};
+
+								})
+								.on( 'end', function() {
+
+									callback( false, {
+										'notification'			: Data_notification
+									});
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								});
+							
+
+							break;
+
+						case 'equipment':
+
+							var Data_equipment 				= [],
+								Data_equipment_dates		= [],
+								Data_equipment_occupation	= [];
+
+							var //_equipment 			= "SELECT equipment.* FROM equipment ORDER BY Name ASC",
+								_equipment 				= "SELECT equipment.*, equipment_dates.length AS dateLength, dates.Name AS dateName, dates.ID AS dateID FROM equipment INNER JOIN equipment_dates ON equipment.ID = equipment_dates.equipmentID INNER JOIN dates ON equipment_dates.dateID = dates.ID ORDER BY equipment.Name ASC",
+								_equipment_dates 		= "SELECT equipment_dates.* FROM equipment_dates ORDER BY ID ASC",
+								_equipment_occupation 	= "SELECT equipment_occupation.* FROM equipment_occupation ORDER BY ID ASC";
+
+							var today 	= new Date();
+							
+							query = connection.query( _equipment + ";" + _equipment_dates + ";" + _equipment_occupation );
+							query
+								.on( 'error', function(err) {
+									
+									//result.push( err );
+
+									callback( err.code );
+									// Handle error, an 'end' event will be emitted after this as well
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								})
+								.on( 'fields', function(fields) {
+									
+									// the field packets for the rows to follow
+								})
+								.on( 'result', function( row, index ) {
+
+									switch ( index ) {
+
+										case 0:
+
+											row.redDate 	= today;//_date_by_subtracting_days( today, parseInt(row['dateLength']) );
+											row.orangeDate 	= today;//_date_by_subtracting_days( today, (parseInt(row['dateLength']) - 30) );
+
+											var found 	= false,
+												prefix 	= row['dateName'].replace(/\s+/g, '');
+											var prefix1 = prefix + 'DateLength',
+												prefix2 = prefix + 'redDate',
+												prefix3 = prefix + 'orangeDate',
+												result 	= {
+													'ID'	: row['ID'],
+													'Name'	: row['Name'],
+													//'' + prefix1 + '' : row['dateLength'],
+													//'' + prefix2 + '' : row['redDate'],
+													//'' + prefix3 + '' : row['orangeDate'],
+													'data'  : []
+												};
+
+												result[prefix1] = row['dateLength'];
+												result[prefix2] = row['redDate'];
+												result[prefix3] = row['orangeDate'];
+
+											if( Data_equipment.length > 0  ) {
+
+												for (var i = 0; i < Data_equipment.length; i++) {
+
+													if( Data_equipment[i].ID ==  row['ID'] ) { 
+
+														found = true;
+
+														Data_equipment[i][prefix1] = row['dateLength'];
+														Data_equipment[i][prefix2] = row['redDate'];
+														Data_equipment[i][prefix3] = row['orangeDate'];
+														//Data_equipment[i][prefix2] = util.date_by_subtracting_days( today, parseInt(row['dateLength']) );
+														//Data_equipment[i][prefix3] = util.date_by_subtracting_days( today, parseInt(row['dateLength']) );
+
+														Data_equipment[i].data.push({
+															'dateID'		: row['dateID'],
+															'dateName'		: row['dateName'],
+															'dateLength'	: row['dateLength'],
+															'redDate'		: row['redDate'],
+															'orangeDate'	: row['orangeDate']
+														});
 
 													}
 
 												}
 
+												if( found == true ) {} else {
+
+													result.data.push({
+														'dateID'		: row['dateID'],
+														'dateName'		: row['dateName'],
+														'dateLength'	: row['dateLength'],
+														'redDate'		: row['redDate'],
+														'orangeDate'	: row['orangeDate']
+													});
+												
+													Data_equipment.push( result );
+
+												}
+
+											} else { 
+
+												if( found == true ) {} else {
+
+													result.data.push({
+														'dateID'		: row['dateID'],
+														'dateName'		: row['dateName'],
+														'dateLength'	: row['dateLength'],
+														'redDate'		: row['redDate'],
+														'orangeDate'	: row['orangeDate']
+													});
+												
+													Data_equipment.push( result );
+
+												}
+											
 											}
 
-											if( added === true ) {} else {
+											break;
 
-												switch( parseInt(Data_userMeta[j].dateID) ) {
+										case 1:
 
-														case 1: // PTO Date
+											Data_equipment_dates.push( row );
 
-																Data_users[i].meta.push({
-																	'equipmentID' 	: Data_userMeta[j].equipmentID,
-																	'PTODate'		: Data_userMeta[j].value
-																});
+											break;
 
-																break;
+										case 2:
 
-														case 2: // Certificate Date
+											Data_equipment_occupation.push( row );
 
-																Data_users[i].meta.push({
-																	'equipmentID' 		: Data_userMeta[j].equipmentID,
-																	'certificateDate'	: Data_userMeta[j].value
-																});
+											break;
 
-																break;
+									};
 
-														case 3: // Appointment Date
+								})
+								.on( 'end', function() {
 
-																Data_users[i].meta.push({
-																	'equipmentID' 		: Data_userMeta[j].equipmentID,
-																	'appointmentDate'	: Data_userMeta[j].value
-																});
+									// loop thru 
+									for (var i = 0; i < Data_equipment.length; i++) {
 
-																break;
+										if( Data_equipment[i] ) {
+
+											Data_equipment[i].occupations = [];
+
+											for (var j = 0; j < Data_equipment_occupation.length; j++) {
+
+												if( Data_equipment[i].ID == Data_equipment_occupation[j].equipmentID ) {
+
+													Data_equipment[i].occupations.push(Data_equipment_occupation[j]);
 
 												}
 
 											}
 
-										} else {
-
-											switch( parseInt(Data_userMeta[j].dateID) ) {
-
-													case 1: // PTO Date
-
-														Data_users[i].meta.push({
-															//'dateID' 		: Data_userMeta[j].dateID,
-															//'dateName'		: Data_userMeta[j].dateName,
-															'equipmentID' 	: Data_userMeta[j].equipmentID,
-															'PTODate'		: Data_userMeta[j].value
-														});
-
-														/** /
-														Data_users[i].meta.push({
-															'dateID' 		: Data_userMeta[j].dateID,
-															//'dateName'		: Data_userMeta[j].dateName,
-															'equipmentID' 	: Data_userMeta[j].equipmentID,
-															'PTODate'		: Data_userMeta[j].value
-														});/**/
-
-														break;
-
-													case 2: // Certificate Date
-
-														Data_users[i].meta.push({
-															//'dateID' 			: Data_userMeta[j].dateID,
-															//'dateName'			: Data_userMeta[j].dateName,
-															'equipmentID' 		: Data_userMeta[j].equipmentID,
-															'certificateDate'	: Data_userMeta[j].value
-														});
-
-														break;
-
-													case 3: // Appointment Date
-
-														Data_users[i].meta.push({
-															//'dateID' 			: Data_userMeta[j].dateID,
-															//'dateName'			: Data_userMeta[j].dateName,
-															'equipmentID' 		: Data_userMeta[j].equipmentID,
-															'appointmentDate'	: Data_userMeta[j].value
-														});
-
-														break;
-
-											}
-
 										}
 
-										//Data_users[i].meta.push(Data_userMeta[j]);					
-
-									}
-
-								}
-
-							}
-
-						};
-
-						callback( false, {
-							'users'			: Data_users,
-							'userMeta'		: Data_userMeta,
-							'supervisors'	: Data_supervisors
-						});
-
-					});
-
-				/** /
-				query = 
-					"SELECT " +
-						"mighty5ive_accounts.*, " +
-						"mighty5ive_account_types.Name AS AccountType, " +
-						"mighty5ive_account_types.Rate AS AccountRate, " +
-						"mighty5ive_account_modules.Name AS ModuleName, " +
-						"mighty5ive_account_notification_types.ID AS notification_type_id, " +
-						"mighty5ive_account_addresses.address, " +
-						"mighty5ive_account_addresses.postal_code, " +
-						"mighty5ive_countries.Name AS CountryName, " +
-						"mighty5ive_provinces.Name AS ProvinceName " +
-					"FROM " +
-						"mighty5ive_accounts " +
-					"INNER JOIN " +
-						"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-					"INNER JOIN " +
-						"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-					"LEFT JOIN " +
-						"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-					"INNER JOIN " +
-						"mighty5ive_account_addresses ON mighty5ive_accounts.ID = mighty5ive_account_addresses.client_id " +
-					"INNER JOIN " +
-						"mighty5ive_countries ON mighty5ive_account_addresses.country = mighty5ive_countries.ID " +
-					"INNER JOIN " +
-						"mighty5ive_provinces ON mighty5ive_account_addresses.province = mighty5ive_provinces.ID " +
-					"WHERE mighty5ive_accounts.ID =? " +
-					"ORDER BY account_name ASC";
-
-				_mysqlServer.query( query, [ options.id ], function( err, results ) {
-				
-					if ( err ) {
-
-						callback({
-							'error': true,
-							'type': "profile",
-							'data': err
-						});
-
-					} else {
-
-						callback({
-							'error': false,
-							'type': "profile",
-							'data': results[0]
-						});
-
-						query = null;
-
-					}
-
-				});/**/
-
-				break;
-
-			case 'notifications':
-
-				//callback('fuck!');
-				/**/
-				var Data_notification			= [],
-					_notification 				= "SELECT notifications.ID, notifications.date AS notificationDate, notifications.employeeID, notifications.supervisorID, notifications.equipmentID, notifications.dateID, notifications.notificationTypeID, notifications.dateValue, notifications.status, notifications.message, users.firstName, users.lastName, users.idNumber, users.departmentID, users.occupationID, equipment.Name AS equipmentName, dates.Name AS dateName FROM notifications INNER JOIN users ON notifications.employeeID = users.ID INNER JOIN equipment ON notifications.equipmentID = equipment.ID INNER JOIN dates ON notifications.dateID = dates.ID ORDER BY notifications.date ASC";
-					//_notification 				= "SELECT notifications.* FROM notifications ORDER BY notifications.date ASC";
-				
-				query = _mysqlServer.query( _notification );
-				query
-					.on( 'error', function(err) {
-						
-						//result.push( err );
-
-						callback( err.code );
-						// Handle error, an 'end' event will be emitted after this as well
-					})
-					.on( 'fields', function(fields) {
-						
-						// the field packets for the rows to follow
-					})
-					.on( 'result', function( row, index ) {
-
-						switch ( index ) {
-
-							case 0:
-
-								row.employeeName = row.firstName + ' ' + row.lastName;
-
-								Data_notification.push( row );
-
-								break;
-
-						};
-
-					})
-					.on( 'end', function() {
-
-						callback( false, {
-							'notification'			: Data_notification
-						});
-
-					});
-				/**/
-
-				break;
-
-			case 'equipment':
-
-				var Data_equipment 				= [],
-					Data_equipment_dates		= [],
-					Data_equipment_occupation	= [];
-
-				var //_equipment 			= "SELECT equipment.* FROM equipment ORDER BY Name ASC",
-					_equipment 				= "SELECT equipment.*, equipment_dates.length AS dateLength, dates.Name AS dateName, dates.ID AS dateID FROM equipment INNER JOIN equipment_dates ON equipment.ID = equipment_dates.equipmentID INNER JOIN dates ON equipment_dates.dateID = dates.ID ORDER BY equipment.Name ASC",
-					_equipment_dates 		= "SELECT equipment_dates.* FROM equipment_dates ORDER BY ID ASC",
-					_equipment_occupation 	= "SELECT equipment_occupation.* FROM equipment_occupation ORDER BY ID ASC";
-
-				var today 	= new Date();
-				
-				query = _mysqlServer.query( _equipment + ";" + _equipment_dates + ";" + _equipment_occupation );
-				query
-					.on( 'error', function(err) {
-						
-						//result.push( err );
-
-						callback( err.code );
-						// Handle error, an 'end' event will be emitted after this as well
-					})
-					.on( 'fields', function(fields) {
-						
-						// the field packets for the rows to follow
-					})
-					.on( 'result', function( row, index ) {
-
-						switch ( index ) {
-
-							case 0:
-
-								row.redDate 	= today;//_date_by_subtracting_days( today, parseInt(row['dateLength']) );
-								row.orangeDate 	= today;//_date_by_subtracting_days( today, (parseInt(row['dateLength']) - 30) );
-
-								var found 	= false,
-									prefix 	= row['dateName'].replace(/\s+/g, '');
-								var prefix1 = prefix + 'DateLength',
-									prefix2 = prefix + 'redDate',
-									prefix3 = prefix + 'orangeDate',
-									result 	= {
-										'ID'	: row['ID'],
-										'Name'	: row['Name'],
-										//'' + prefix1 + '' : row['dateLength'],
-										//'' + prefix2 + '' : row['redDate'],
-										//'' + prefix3 + '' : row['orangeDate'],
-										'data'  : []
 									};
 
-									result[prefix1] = row['dateLength'];
-									result[prefix2] = row['redDate'];
-									result[prefix3] = row['orangeDate'];
+									callback( false, {
+										'equipment'				: Data_equipment,
+										'equipment_dates'		: Data_equipment_dates,
+										'equipment_occupation'	: Data_equipment_occupation
+									});
 
-								if( Data_equipment.length > 0  ) {
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-									for (var i = 0; i < Data_equipment.length; i++) {
+								});
 
-										if( Data_equipment[i].ID ==  row['ID'] ) { 
+							break;
 
-											found = true;
+						case 'hse-data': 
 
-											Data_equipment[i][prefix1] = row['dateLength'];
-											Data_equipment[i][prefix2] = row['redDate'];
-											Data_equipment[i][prefix3] = row['orangeDate'];
-											//Data_equipment[i][prefix2] = util.date_by_subtracting_days( today, parseInt(row['dateLength']) );
-											//Data_equipment[i][prefix3] = util.date_by_subtracting_days( today, parseInt(row['dateLength']) );
+							var Data_dates 				= [],
+								Data_department 		= [],
+								Data_occupation 		= [],
+								Data_userType 			= [],
+								Data_supervisors		= [];
 
-											Data_equipment[i].data.push({
-												'dateID'		: row['dateID'],
-												'dateName'		: row['dateName'],
-												'dateLength'	: row['dateLength'],
-												'redDate'		: row['redDate'],
-												'orangeDate'	: row['orangeDate']
-											});
+							var _dates 				= "SELECT dates.* FROM dates ORDER BY Name ASC",
+								_department 		= "SELECT department.* FROM department ORDER BY Name ASC",
+								_occupation 		= "SELECT occupation.* FROM occupation ORDER BY Name ASC",
+								_userType 			= "SELECT userType.* FROM userType ORDER BY Name ASC",
+								_supervisors		= "SELECT supervisors.*, users.firstName, users.lastName, users.idNumber, users.employeeNumber, users.emailAddress, department.Name FROM supervisors INNER JOIN users ON supervisors.userID = users.ID INNER JOIN department ON supervisors.departmentID = department.ID ORDER BY users.lastName ASC";
 
-										}
-
-									}
-
-									if( found == true ) {} else {
-
-										result.data.push({
-											'dateID'		: row['dateID'],
-											'dateName'		: row['dateName'],
-											'dateLength'	: row['dateLength'],
-											'redDate'		: row['redDate'],
-											'orangeDate'	: row['orangeDate']
-										});
+							query = connection.query( _dates + ";" + _department + ";" + _occupation + ";" + _userType + ";" + _supervisors );
+							query
+								.on( 'error', function(err) {
 									
-										Data_equipment.push( result );
+									//result.push( err );
 
-									}
+									callback( err.code );
+									// Handle error, an 'end' event will be emitted after this as well
 
-								} else { 
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-									if( found == true ) {} else {
-
-										result.data.push({
-											'dateID'		: row['dateID'],
-											'dateName'		: row['dateName'],
-											'dateLength'	: row['dateLength'],
-											'redDate'		: row['redDate'],
-											'orangeDate'	: row['orangeDate']
-										});
+								})
+								.on( 'fields', function(fields) {
 									
-										Data_equipment.push( result );
+									// the field packets for the rows to follow
+								})
+								.on( 'result', function( row, index ) {
 
-									}
-								
-								}
+									switch ( index ) {
 
-								break;
+										case 0:
 
-							case 1:
+											Data_dates.push( row );
 
-								Data_equipment_dates.push( row );
+											break;
 
-								break;
+										case 1:
 
-							case 2:
+											Data_department.push( row );
 
-								Data_equipment_occupation.push( row );
+											break;
 
-								break;
+										case 2:
 
-						};
+											Data_occupation.push( row );
 
-					})
-					.on( 'end', function() {
+											break;
 
-						// loop thru 
-						for (var i = 0; i < Data_equipment.length; i++) {
+										case 3:
 
-							if( Data_equipment[i] ) {
+											Data_userType.push( row );
 
-								Data_equipment[i].occupations = [];
+											break;
 
-								for (var j = 0; j < Data_equipment_occupation.length; j++) {
+										case 4:
 
-									if( Data_equipment[i].ID == Data_equipment_occupation[j].equipmentID ) {
+											row.displayName = row.firstName + ' ' + row.lastName;
 
-										Data_equipment[i].occupations.push(Data_equipment_occupation[j]);
+											Data_supervisors.push( row );
 
-									}
+											break;
 
-								}
+									};
 
-							}
+								})
+								.on( 'end', function() {
 
-						};
+									callback( false, {
+										'dates' 			: Data_dates,
+										'department' 		: Data_department,
+										'occupation'		: Data_occupation,
+										'userType'			: Data_userType,
+										'supervisors'		: Data_supervisors
+									});
 
-						callback( false, {
-							'equipment'				: Data_equipment,
-							'equipment_dates'		: Data_equipment_dates,
-							'equipment_occupation'	: Data_equipment_occupation
-						});
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-					});
+								});
 
-				break;
+							break;
 
-			case 'hse-data': 
+						default:
 
-				var Data_dates 				= [],
-					Data_department 		= [],
-					Data_occupation 		= [],
-					Data_userType 			= [],
-					Data_supervisors		= [];
+							callback( true, 'data type [' + options.type + '] not specified' );
 
-				var _dates 				= "SELECT dates.* FROM dates ORDER BY Name ASC",
-					_department 		= "SELECT department.* FROM department ORDER BY Name ASC",
-					_occupation 		= "SELECT occupation.* FROM occupation ORDER BY Name ASC",
-					_userType 			= "SELECT userType.* FROM userType ORDER BY Name ASC",
-					_supervisors		= "SELECT supervisors.*, users.firstName, users.lastName, users.idNumber, users.employeeNumber, users.emailAddress, department.Name FROM supervisors INNER JOIN users ON supervisors.userID = users.ID INNER JOIN department ON supervisors.departmentID = department.ID ORDER BY users.lastName ASC";
+							// And done with the connection, it has been returned to the pool.
+							connection.release();
 
-				query = _mysqlServer.query( _dates + ";" + _department + ";" + _occupation + ";" + _userType + ";" + _supervisors );
-				query
-					.on( 'error', function(err) {
-						
-						//result.push( err );
-
-						callback( err.code );
-						// Handle error, an 'end' event will be emitted after this as well
-					})
-					.on( 'fields', function(fields) {
-						
-						// the field packets for the rows to follow
-					})
-					.on( 'result', function( row, index ) {
-
-						switch ( index ) {
-
-							case 0:
-
-								Data_dates.push( row );
-
-								break;
-
-							case 1:
-
-								Data_department.push( row );
-
-								break;
-
-							case 2:
-
-								Data_occupation.push( row );
-
-								break;
-
-							case 3:
-
-								Data_userType.push( row );
-
-								break;
-
-							case 4:
-
-								row.displayName = row.firstName + ' ' + row.lastName;
-
-								Data_supervisors.push( row );
-
-								break;
-
-						};
-
-					})
-					.on( 'end', function() {
-
-						callback( false, {
-							'dates' 			: Data_dates,
-							'department' 		: Data_department,
-							'occupation'		: Data_occupation,
-							'userType'			: Data_userType,
-							'supervisors'		: Data_supervisors
-						});
-
-					});
-
-				/** /
-				query = _mysqlServer.query( _dates + ";" + _department + ";" + _equipment + ";" + _equipment_dates + ";" + _occupation + ";" + _supervisors + ";" + _users + ";" + _userType, function( err, result ) {
-						
-
-					if( err ) {
-
-						callback( true, err );
-
-					} else {
-
-						callback( result );
+							break;
 					
 					}
 
-				});/**/
+				}
 
-				break;
+			});
 
-			default:
+		} catch( e ) {
 
-				callback( true, 'data type [' + options.type + '] not specified' );
+			callback( e );
 
-				break;
 		}
 
 	}
@@ -935,93 +951,108 @@
 
 		try {
 
-			switch( options.type ) {
+			_mysqlServer.getConnection( function(err, connection) {
+					
+				if( err ) {
 
-				case 'employee':
+					callback( err.code );
 
-					InsertData = {
-						'firstName'		: options.data.firstName,
-						'lastName'		: options.data.lastName,
-						'idNumber'		: options.data.idNumber,
-						'employeeNumber': options.data.employeeNumber,
-						'emailAddress'	: options.data.emailAddress,
-						'occupationID'	: options.data.occupationID,
-						'departmentID'	: options.data.departmentID,
-						'userTypeID'	: options.data.userTypeID
-					};
+				} else {
 
-					InsertQuery = "INSERT INTO users SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
+					switch( options.type ) {
 
-							if( err ) {
+						case 'employee':
 
-								callback( err.code );
+							InsertData = {
+								'firstName'		: options.data.firstName,
+								'lastName'		: options.data.lastName,
+								'idNumber'		: options.data.idNumber,
+								'employeeNumber': options.data.employeeNumber,
+								'emailAddress'	: options.data.emailAddress,
+								'occupationID'	: options.data.occupationID,
+								'departmentID'	: options.data.departmentID,
+								'userTypeID'	: options.data.userTypeID
+							};
 
-							} else {
-																	
-								callback( false, 'Employee added successfully.' );
+							InsertQuery = "INSERT INTO users SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
 
-							}
-					});
+								if( err ) {
 
-					break;
+									callback( err.code );
 
-				case 'equipment':
-
-					InsertData = {
-						'Name'		: options.data.Name
-					};
-					InsertQuery = "INSERT INTO equipment SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-
-								var dateCounter = 0;
-
-								for (var i = 1; i < 4; i++) {
-									
-									dateCounter++;
-
-									switch( i ) {
-
-										case 1:
-
-											var Data = {
-												'equipmentID'	: dbb.insertId,
-												'dateID'		: i,
-												'length'		: options.data.PTODateLength
-											};
-
-											break;
-
-										case 2:
-
-											var Data = {
-												'equipmentID'	: dbb.insertId,
-												'dateID'		: i,
-												'length'		: options.data.CertificateDateLength
-											};
-
-											break;
-
-										case 3:
-
-											var Data = {
-												'equipmentID'	: dbb.insertId,
-												'dateID'		: i,
-												'length'		: options.data.AppointmentDateLength
-											};
-
-											break;
-									};								
+								} else {
 																			
-									_mysqlServer.query( "INSERT INTO equipment_dates SET ?", Data, function( error, results ) {
+									callback( false, 'Employee added successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+							
+							});
+
+							break;
+
+						case 'equipment':
+
+							InsertData = {
+								'Name'		: options.data.Name
+							};
+							InsertQuery = "INSERT INTO equipment SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								} else {
+
+									var dateCounter = 0;
+
+									for (var i = 1; i < 4; i++) {
+											
+										dateCounter++;
+
+										switch( i ) {
+
+												case 1:
+
+													var Data = {
+														'equipmentID'	: dbb.insertId,
+														'dateID'		: i,
+														'length'		: options.data.PTODateLength
+													};
+
+													break;
+
+												case 2:
+
+													var Data = {
+														'equipmentID'	: dbb.insertId,
+														'dateID'		: i,
+														'length'		: options.data.CertificateDateLength
+													};
+
+													break;
+
+												case 3:
+
+													var Data = {
+														'equipmentID'	: dbb.insertId,
+														'dateID'		: i,
+														'length'		: options.data.AppointmentDateLength
+													};
+
+													break;
+										};							
+																					
+										connection.query( "INSERT INTO equipment_dates SET ?", Data, function( error, results ) {
 
 											if( error ) {
 
@@ -1029,224 +1060,256 @@
 
 													callback( err.code + ' ' + error.code );
 
+													// And done with the connection, it has been returned to the pool.
+													connection.release();
+
 												}
 
 											} else {
-												
+														
 												if( (dateCounter + 1) >= 4 ) {
-												
+													
 													callback( false, 'Equipment and dates (' + dateCounter + ') added successfully.' );
-												
+
+													// And done with the connection, it has been returned to the pool.
+													connection.release();
+														
 												}
 
 											}
-									});
-
-								}
-		
-								//callback( false, 'Equipment added successfully.' );
-
-							}
-					});
-					
-					break;
-
-				case 'equipment-occupation':
-
-					InsertData = {
-						'equipmentID'		: options.data.equipmentID,
-						'occupationID'		: options.data.occupationID
-					};
-					InsertQuery = "INSERT INTO equipment_occupation SET ?";
-													
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-								
-								callback( false, 'Equipment, Occupation-allocation set.' );
-
-							}
-
-					});
-
-					break;
-
-				case 'notification':
-
-					InsertData = {
-						'employeeID'			: options.data.employeeID,
-						'supervisorID'			: options.data.supervisorID,
-						'equipmentID'			: options.data.equipmentID,
-						'dateID'				: options.data.dateID,
-						'dateValue'				: options.data.dateValue,
-						'notificationTypeID'	: options.data.notificationTypeID,
-						'status'				: 3,//options.data.status,
-						'message'				: 'N/A'
-					};
-					InsertQuery = "INSERT INTO notifications SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-
-								callback( false, 'Notification added successfully.' );
-
-							}
-					});
-
-					break;
-
-				case 'occupation':
-
-					InsertData = {
-						'Name'		: options.data.Name
-					};
-					InsertQuery = "INSERT INTO occupation SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-																	
-								callback( false, 'Occupation added successfully.' );
-
-							}
-					});
-
-					break;
-
-				case 'department':
-
-					InsertData = {
-						'Name'		: options.data.Name
-					};
-					InsertQuery = "INSERT INTO department SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-																	
-								callback( false, 'Department added successfully.');
-
-							}
-					});
-
-					break;
-
-				case 'date':
-
-					InsertData = {
-						'Name'		: options.data.Name
-					};
-					InsertQuery = "INSERT INTO dates SET ?";
-																						
-					_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-							if( err ) {
-
-								callback( err.code );
-
-							} else {
-																	
-								callback( false, 'Date added successfully.' );
-
-							}
-					});
-
-					break;
-
-				case 'supervisor':
-
-					InsertQuery = "INSERT INTO supervisors SET ?";
-					InsertData 	= {
-						'departmentID'		: options.data.departmentID,
-						'userID'			: options.data.userID,
-						'supervisorPass'	: options.data.supervisorPass,
-						'appointmentDate'	: options.data.appointmentDate
-					};
-
-					//callback( InsertData );
-
-					/**/
-					_mysqlServer.query( InsertQuery, InsertData, function( error, results ) {
 										
-						if ( error ) {
-
-							callback( error );
-
-						} else {
-
-							callback( false, 'Supervisor created successfully.' );
-						
-						}
-
-					});
-					/**/
-
-					break;
-
-				case 'log':
-
-					GetMac.getMac( function( err, macAddress ) {
-
-						//
-
-						if( err ) {
-
-							callback( err, macAddress);
-
-						} else {	
-
-							InsertData = {
-								'macAddress'	: macAddress,
-								//'last_login'	: '',
-								'hostMachine'	: os.hostName()
-							};
-
-							InsertQuery = "INSERT INTO hseClients SET ?";
-										
-							_mysqlServer.query( InsertQuery, InsertData, function( error, dbb ) {
-
-									if( error ) {
-
-										callback( error.code );
-
-									} else {
-																			
-										callback( false, 'Log added successfully.' );
+										});
 
 									}
+
+								}
+							
 							});
-					
-						}
+							
+							break;
 
+						case 'equipment-occupation':
 
-					});
+							InsertData = {
+								'equipmentID'		: options.data.equipmentID,
+								'occupationID'		: options.data.occupationID
+							};
+							InsertQuery = "INSERT INTO equipment_occupation SET ?";
+															
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
 
-					break;
+								if( err ) {
 
-				default:
+									callback( err.code );
 
-					callback( 'create data type [' + options.type + '] not specified' );
+								} else {
+										
+									callback( false, 'Equipment, Occupation-allocation set.' );
 
-					break;
+								}
 
-			}
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
+							});
+
+							break;
+
+						case 'notification':
+
+							InsertData = {
+								'employeeID'			: options.data.employeeID,
+								'supervisorID'			: options.data.supervisorID,
+								'equipmentID'			: options.data.equipmentID,
+								'dateID'				: options.data.dateID,
+								'dateValue'				: options.data.dateValue,
+								'notificationTypeID'	: options.data.notificationTypeID,
+								'status'				: 3,//options.data.status,
+								'message'				: 'N/A'
+							};
+							InsertQuery = "INSERT INTO notifications SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Notification added successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+							
+							});
+
+							break;
+
+						case 'occupation':
+
+							InsertData = {
+								'Name'		: options.data.Name
+							};
+							InsertQuery = "INSERT INTO occupation SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+																			
+									callback( false, 'Occupation added successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
+							});
+
+							break;
+
+						case 'department':
+
+							InsertData = {
+								'Name'		: options.data.Name
+							};
+							InsertQuery = "INSERT INTO department SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+																			
+									callback( false, 'Department added successfully.');
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
+							});
+
+							break;
+
+						case 'date':
+
+							InsertData = {
+								'Name'		: options.data.Name
+							};
+							InsertQuery = "INSERT INTO dates SET ?";
+																								
+							connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+																		
+									callback( false, 'Date added successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
+							});
+
+							break;
+
+						case 'supervisor':
+
+							InsertQuery = "INSERT INTO supervisors SET ?";
+							InsertData 	= {
+								'departmentID'		: options.data.departmentID,
+								'userID'			: options.data.userID,
+								'supervisorPass'	: options.data.supervisorPass,
+								'appointmentDate'	: options.data.appointmentDate
+							};
+
+							connection.query( InsertQuery, InsertData, function( error, results ) {
+
+								if ( error ) {
+
+									callback( error );
+
+								} else {
+
+									callback( false, 'Supervisor created successfully.' );
+								
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
+							});
+
+							break;
+
+						case 'log':
+
+							GetMac.getMac( function( err, macAddress ) {
+
+								if( err ) {
+
+									callback( err );
+
+								} else {	
+
+									InsertData = {
+										'macAddress'	: macAddress,
+										//'last_login'	: '',
+										'hostMachine'	: os.hostName()
+									};
+
+									InsertQuery = "INSERT INTO hseClients SET ?";
+												
+									connection.query( InsertQuery, InsertData, function( error, dbb ) {
+
+										if( error ) {
+
+											callback( error.code );
+
+										} else {
+																					
+											callback( false, 'Log added successfully.' );
+
+										}
+
+										// And done with the connection, it has been returned to the pool.
+										connection.release();
+
+									});
+							
+								}
+
+							});
+
+							break;
+
+						default:
+
+							callback( 'create data type [' + options.type + '] not specified' );
+
+							// And done with the connection, it has been returned to the pool.
+							connection.release();
+
+							break;
+
+					}
+
+				}
+
+			});
 
 		} catch( e ) {
 
@@ -1273,530 +1336,606 @@
 		var query 	= null,
 			data 	= {};
 
-		switch( options.type ) {
+		try {
 
-			case 'employee':
+			_mysqlServer.getConnection( function(err, connection) {
+					
+				if( err ) {
 
-				query = "UPDATE users SET ? WHERE ID = ?";
-				data = {
-					'firstName'		: options.data.firstName,
-					'lastName'		: options.data.lastName,
-					'idNumber'		: options.data.idNumber,
-					'employeeNumber': options.data.employeeNumber,
-					'emailAddress'	: options.data.emailAddress,
-					'occupationID'	: options.data.occupationID,
-					'departmentID'	: options.data.departmentID,
-					'userTypeID'	: options.data.userTypeID
-				};
+					callback( err.code );
 
-				_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-							
-					if ( error ) {
+				} else {
 
-						callback( error.code );
+					switch( options.type ) {
 
-					} else {
+						case 'employee':
 
-						callback( false, options.data.firstName + ' ' + options.data.lastName + ' updated successfully.' );
+							query = "UPDATE users SET ? WHERE ID = ?";
+							data = {
+								'firstName'		: options.data.firstName,
+								'lastName'		: options.data.lastName,
+								'idNumber'		: options.data.idNumber,
+								'employeeNumber': options.data.employeeNumber,
+								'emailAddress'	: options.data.emailAddress,
+								'occupationID'	: options.data.occupationID,
+								'departmentID'	: options.data.departmentID,
+								'userTypeID'	: options.data.userTypeID
+							};
 
-					}
+							connection.query( query, [data, options.data.ID], function( error, results ) {
+										
+								if ( error ) {
 
-				});
+									callback( error.code );
 
-				break;
+								} else {
 
-			case 'employee-equipment':
-
-				// find current relationships
-				_mysqlServer.query( "SELECT usersMeta.* FROM usersMeta WHERE userID = ?", [options.data.userID], function( error, results ) {
-
-					if ( error ) {
-
-						callback( error.code );
-
-					} else {
-
-						if( results.length > 0 ) {
-
-							// existing relationships inserts +/ updates
-
-							var toBeRemoved = 0;
-							var updated 	= 0;
-							var added 		= [];
-
-							var resultsID 	= [];
-							var insertions 	= 0;
-
-							for (var j = 0; j < results.length; j++) {
-
-								insertions++;
-
-								if( options.data.dateID == results[j].dateID && options.data.userID == results[j].userID && options.data.equipmentID == results[j].equipmentID ) {
-
-									//update & splice occupations statement
-									//updated++;
-									callback( false, 'Equipment updated');
-
-									return;
+									callback( false, options.data.firstName + ' ' + options.data.lastName + ' updated successfully.' );
 
 								}
 
-							}
-
-							// no relationships...just inserts
-							var errors = [],
-								InsertData = {
-										'userID'		: options.data.userID,
-										'equipmentID'	: options.data.equipmentID,
-										'dateID'		: options.data.dateID,
-										'value'			: options.data.dateValue
-								},
-								InsertQuery = "INSERT INTO usersMeta SET ?";
-
-							_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-									insertions++;
-
-									if( err ) {
-
-										callback( err.code );
-												
-									} else {
-
-										callback( false, 'Equipment Allocated successfully.' );
-
-									}
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
 
 							});
 
-						} else {
+							break;
 
-							var insertions = 0;
+						case 'employee-equipment':
 
-							// no relationships...just inserts
-							var errors = [],
-								InsertData = {
-										'userID'		: options.data.userID,
-										'equipmentID'	: options.data.equipmentID,
-										'dateID'		: options.data.dateID,
-										'value'			: options.data.dateValue
-								},
-								InsertQuery = "INSERT INTO usersMeta SET ?";
+							// find current relationships
+							connection.query( "SELECT usersMeta.* FROM usersMeta WHERE userID = ?", [options.data.userID], function( error, results ) {
 
-							_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
+								if ( error ) {
 
-									insertions++;
+									callback( error.code );
 
-									if( err ) {
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
 
-										//errors.push(err);
+								} else {
 
-										callback( err.code );
-		
-									} else {
+									if( results.length > 0 ) {
 
-										callback( false, 'Equipment Allocated successfully.' );
+										// existing relationships inserts +/ updates
 
-									}
+										var toBeRemoved = 0;
+										var updated 	= 0;
+										var added 		= [];
 
-							});
+										var resultsID 	= [];
+										var insertions 	= 0;
 
-						}
-					}
-				
-				});
+										for (var j = 0; j < results.length; j++) {
 
-				break;
+											insertions++;
 
-			case 'employee-equipment-update':
+											if( options.data.dateID == results[j].dateID && options.data.userID == results[j].userID && options.data.equipmentID == results[j].equipmentID ) {
 
-				_mysqlServer.query( "SELECT usersMeta.* FROM usersMeta WHERE userID = ?", [options.data.userID], function( error, results ) {
+												//update & splice occupations statement
+												//updated++;
+												callback( false, 'Equipment updated');
 
-					if ( error ) {
+												// And done with the connection, it has been returned to the pool.
+												connection.release();
 
-						callback( error.code );
+												return;
 
-					} else {
+											}
 
-						if( results.length > 0 ) {
-
-							// existing relationships inserts +/ updates
-
-							var toBeRemoved = 0;
-							var updated 	= 0;
-							var added 		= [];
-
-							var resultsID 	= [];
-							var insertions 	= 0;
-
-							for (var j = 0; j < results.length; j++) {
-
-								insertions++;
-
-								if( parseInt(options.data.dateID) == results[j].dateID && parseInt(options.data.userID) == results[j].userID && parseInt(options.data.equipmentID) == results[j].equipmentID ) {
-
-									//callback( false, 'Employee Equipment Dates updated successfully.' );
-									
-									var updateData = {
-										'value'			: options.data.value
-									};/**/
-
-									_mysqlServer.query( "UPDATE usersMeta SET ? WHERE ID = ? ", [updateData, results[j].ID], function( error, outcome ) {
-														
-										if ( error ) {
-
-											callback( error.code );
-
-										} else {
-
-											callback( false, 'Employee Equipment Dates updated successfully.' );
 										}
 
-									});/**/
+										// no relationships...just inserts
+										var errors = [],
+											InsertData = {
+													'userID'		: options.data.userID,
+													'equipmentID'	: options.data.equipmentID,
+													'dateID'		: options.data.dateID,
+													'value'			: options.data.dateValue
+											},
+											InsertQuery = "INSERT INTO usersMeta SET ?";
 
-								}
+										connection.query( InsertQuery, InsertData, function( err, dbb ) {
 
-							}
+											insertions++;
 
-						} else {
+											if( err ) {
 
-							callback('Employee has no equipment allocated.')
+												callback( err.code );
+															
+											} else {
 
-						}
+												callback( false, 'Equipment Allocated successfully.' );
 
-					}
-				
-				});
+											}
 
-				break;
+											// And done with the connection, it has been returned to the pool.
+											connection.release();
 
-			case 'equipment':
-
-				query = "UPDATE equipment SET ? WHERE ID = ?";
-				data = {
-					'Name'		: options.data.Name
-				};
-
-				_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-									
-					if ( error ) {
-
-						callback( error.code );
-
-					} else {
-
-							var nbLength =  options.data.occupations.length;
-
-							if( nbLength > 0 ) {
-
-								var errors = [];
-
-								// find current relationships
-								_mysqlServer.query( "SELECT equipment_occupation.* FROM equipment_occupation WHERE equipmentID = ?", [options.data.ID], function( error, results ) {
-
-									if ( error ) {
-
-										callback( error.code );
+										});
 
 									} else {
 
-										if( results.length > 0 ) {
+										var insertions = 0;
 
-											// existing relationships inserts +/ updates
+										// no relationships...just inserts
+										var errors = [],
+											InsertData = {
+													'userID'		: options.data.userID,
+													'equipmentID'	: options.data.equipmentID,
+													'dateID'		: options.data.dateID,
+													'value'			: options.data.dateValue
+											},
+											InsertQuery = "INSERT INTO usersMeta SET ?";
 
-											var toBeRemoved = 0;
-											var updated = 0;
-											var added = [];
+										connection.query( InsertQuery, InsertData, function( err, dbb ) {
 
-											var resultsID = [];
+											insertions++;
 
-											
-												for (var j = 0; j < results.length; j++) {
+											if( err ) {
 
-													//if( options.data.occupations[i] == results[j].ID ) {
+												//errors.push(err);
 
-													if( options.data.occupations.indexOf( results[j].ID ) !== -1 ) {
+												callback( err.code );
+					
+											} else {
 
-														//update & splice occupations statement
-														updated++;
+												callback( false, 'Equipment Allocated successfully.' );
+
+											}
+
+											// And done with the connection, it has been returned to the pool.
+											connection.release();
+
+										});
+
+									}
+								
+								}
+							
+							});
+
+							break;
+
+						case 'employee-equipment-update':
+
+							connection.query( "SELECT usersMeta.* FROM usersMeta WHERE userID = ?", [options.data.userID], function( error, results ) {
+
+								if ( error ) {
+
+									callback( error.code );
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								} else {
+
+									if( results.length > 0 ) {
+
+										// existing relationships inserts +/ updates
+
+										var toBeRemoved = 0;
+										var updated 	= 0;
+										var added 		= [];
+
+										var resultsID 	= [];
+										var insertions 	= 0;
+
+										for (var j = 0; j < results.length; j++) {
+
+											insertions++;
+
+											if( parseInt(options.data.dateID) == results[j].dateID && parseInt(options.data.userID) == results[j].userID && parseInt(options.data.equipmentID) == results[j].equipmentID ) {
+
+												//callback( false, 'Employee Equipment Dates updated successfully.' );
+												
+												var updateData = {
+													'value'			: options.data.value
+												};
+
+												connection.query( "UPDATE usersMeta SET ? WHERE ID = ? ", [updateData, results[j].ID], function( error, outcome ) {
+																	
+													if ( error ) {
+
+														callback( error.code );
 
 													} else {
 
-														// delete query
-														//toBeRemoved++;
-
-														/**/
-														var deleteQuery = "DELETE FROM equipment_occupation WHERE ID = ?";
-
-														_mysqlServer.query( deleteQuery, [results[j].ID], function( err, dbb ) {
-
-															if( err ) {
-
-																//errors.push(err);
-
-															} else {
-
-																toBeRemoved++;
-
-																//callback( 'Equipment updated successfully and occupation allocation set.' );
-
-															}
-
-														});/**/
-														
+														callback( false, 'Employee Equipment Dates updated successfully.' );
 													}
 
-													resultsID.push(results[j].ID);
+													// And done with the connection, it has been returned to the pool.
+													connection.release();
 
-												}
+												});
 
-												var array3 = options.data.occupations.filter(function(obj) { return resultsID.indexOf(obj) == -1; });
+											}
 
-												// if occupations > 0 insert entries (means occupation is new and was not in existing db results)
-												if( options.data.occupations.length !== updated && ( (options.data.occupations.length - updated) == array3.length )  ) {
+										}
 
-													for (var h = 0; h < array3.length; h++) {
-														
+									} else {
+
+										callback('Employee has no equipment allocated.');
+
+										// And done with the connection, it has been returned to the pool.
+										connection.release();
+
+									}
+
+								}
+							
+							});
+
+							break;
+
+						case 'equipment':
+
+							query = "UPDATE equipment SET ? WHERE ID = ?";
+							data = {
+								'Name'		: options.data.Name
+							};
+
+							connection.query( query, [data, options.data.ID], function( error, results ) {
+												
+								if ( error ) {
+
+									callback( error.code );
+
+									// And done with the connection, it has been returned to the pool.
+									connection.release();
+
+								} else {
+
+									var nbLength =  options.data.occupations.length;
+
+									if( nbLength > 0 ) {
+
+										var errors = [];
+
+										// find current relationships
+										connection.query( "SELECT equipment_occupation.* FROM equipment_occupation WHERE equipmentID = ?", [options.data.ID], function( error, results ) {
+
+											if ( error ) {
+
+												callback( error.code );
+
+												// And done with the connection, it has been returned to the pool.
+												connection.release();
+
+											} else {
+
+												if( results.length > 0 ) {
+
+													// existing relationships inserts +/ updates
+
+													var toBeRemoved = 0;
+													var updated = 0;
+													var added = [];
+
+													var resultsID = [];
+
+													for (var j = 0; j < results.length; j++) {
+
+														//if( options.data.occupations[i] == results[j].ID ) {
+
+														if( options.data.occupations.indexOf( results[j].ID ) !== -1 ) {
+
+															//update & splice occupations statement
+															updated++;
+
+														} else {
+
+															// delete query
+															//toBeRemoved++;
+
+															/**/
+															var deleteQuery = "DELETE FROM equipment_occupation WHERE ID = ?";
+
+															connection.query( deleteQuery, [results[j].ID], function( err, dbb ) {
+
+																if( err ) {
+
+																	//errors.push(err);
+
+																} else {
+
+																	toBeRemoved++;
+
+																	//callback( 'Equipment updated successfully and occupation allocation set.' );
+
+																}
+
+															});/**/
+																	
+														}
+
+														resultsID.push(results[j].ID);
+
+													}
+
+													var array3 = options.data.occupations.filter(function(obj) { return resultsID.indexOf(obj) == -1; });
+
+													// if occupations > 0 insert entries (means occupation is new and was not in existing db results)
+													if( options.data.occupations.length !== updated && ( (options.data.occupations.length - updated) == array3.length )  ) {
+
+														for (var h = 0; h < array3.length; h++) {
+																	
+															var InsertData = {
+																	'equipmentID'		: options.data.ID,
+																	'occupationID'		: array3[h]
+																},
+																InsertQuery = "INSERT INTO equipment_occupation SET ?";
+																								
+															connection.query( InsertQuery, InsertData, function( err, dbb ) {
+
+																if( err ) {
+
+																	errors.push(err);
+
+																} else {
+																			
+																	//callback( 'Equipment, Occupation-allocation set.' );
+
+																}
+
+															});
+
+														};
+
+														//callback( false, 'Equipment & Occupation [' + updated + ' allocations / ' + results.length + '] updated successfully. Allocations to be added ' + array3.length + '. Allocations to be removed ' + toBeRemoved + ' ...not really', results );
+														callback( false, 'Equipment updated successfully and occupation allocations set.' );
+
+													} else {
+
+														//callback( false, 'Equipment & Occupation [' + updated + ' allocations / ' + results.length + '] updated successfully. Allocations Removed ' + toBeRemoved + '. Allocations to be added ' + (options.data.occupations.length - updated) + ' . ...not really', results );
+														callback( false, 'Equipment updated successfully and occupation allocations set.' );
+
+													}
+
+													// And done with the connection, it has been returned to the pool.
+													connection.release();							
+
+												} else {
+
+													// no relationships...just inserts
+
+													for ( var i = 0; i < nbLength; i++ ) {
+									
 														var InsertData = {
 															'equipmentID'		: options.data.ID,
-															'occupationID'		: array3[h]
+															'occupationID'		: options.data.occupations[i]
 														},
 														InsertQuery = "INSERT INTO equipment_occupation SET ?";
-																					
-														_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
+															
+														connection.query( InsertQuery, InsertData, function( err, dbb ) {
 
 															if( err ) {
 
 																errors.push(err);
 
 															} else {
-																
-																//callback( 'Equipment, Occupation-allocation set.' );
+
+																//callback( 'Equipment updated successfully and occupation allocation set.' );
 
 															}
 
 														});
-
+															
+														//Things[i]
+												
 													};
 
-													//callback( false, 'Equipment & Occupation [' + updated + ' allocations / ' + results.length + '] updated successfully. Allocations to be added ' + array3.length + '. Allocations to be removed ' + toBeRemoved + ' ...not really', results );
-													callback( false, 'Equipment updated successfully and occupation allocations set.' );
+													if( errors.length > 0 ) {
 
-												} else {
-
-													//callback( false, 'Equipment & Occupation [' + updated + ' allocations / ' + results.length + '] updated successfully. Allocations Removed ' + toBeRemoved + '. Allocations to be added ' + (options.data.occupations.length - updated) + ' . ...not really', results );
-													callback( false, 'Equipment updated successfully and occupation allocations set.' );
-
-												}									
-
-										} else {
-											/**/
-											// no relationships...just inserts
-											for (var i = 0; i < nbLength; i++) {
-						
-												var InsertData = {
-													'equipmentID'		: options.data.ID,
-													'occupationID'		: options.data.occupations[i]
-												},
-												InsertQuery = "INSERT INTO equipment_occupation SET ?";
-												
-												_mysqlServer.query( InsertQuery, InsertData, function( err, dbb ) {
-
-													if( err ) {
-
-														errors.push(err);
+														callback( errors );
 
 													} else {
-
-														//callback( 'Equipment updated successfully and occupation allocation set.' );
-
+														
+														callback( false, 'Equipment updated successfully and occupation allocations set.' );
+												
 													}
 
-												});
-												
-												//Things[i]
-											};
+													// And done with the connection, it has been returned to the pool.
+													connection.release();
 
-											if( errors.length > 0 ) {
+												}
 
-												callback( errors );
-
-											} else {
-											
-												callback( false, 'Equipment updated successfully and occupation allocations set.' );
 											}
-											/**/
+										
+										});
+										
+									} else {
 
-											//callback( 'Chief!' );
+										callback( false, 'Equipment updated successfully.' );
+
+										// And done with the connection, it has been returned to the pool.
+										connection.release();
+
+									}
+
+								}
+
+							});
+
+							/** /
+							_mysqlServer.connect();
+
+							_mysqlServer.beginTransaction( function( err ) {
+			  				
+			  					if ( err ) { 
+			  						
+			  						_mysqlServer.rollback( function() {
+
+										callback( err );
+										
+									});
+
+			  					} else {
+
+									_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
+												
+										if ( error ) {
+
+											_mysqlServer.rollback( function() {
+
+												callback( error );
+												
+											});
+											//callback( error );
+
+										} else {
+
+											_mysqlServer.commit( function( errr ) {
+												
+												if (errr) { 
+															
+													_mysqlServer.rollback( function() {
+
+														callback( error );
+															
+													});
+														
+												} else {
+
+													callback( 'Equipment updated successfully.' );
+												}
+											
+											});
+
+											//callback( 'Equipment updated successfully.' );
 
 										}
 
-									}
-								});
-							
-							} else {
+									});
 
-								callback( false, 'Equipment updated successfully.' );
+								}
+							});/**/
 
-							}
+							//callback( 'User updated successfully...Nearly' );
 
-					}
+							break;
 
-				});
+						case 'occupation':
 
-				/** /
-				_mysqlServer.connect();
+							query = "UPDATE occupation SET ? WHERE ID = ?";
+							data = {
+								'Name'		: options.data.Name
+							};
 
-				_mysqlServer.beginTransaction( function( err ) {
-  				
-  					if ( err ) { 
-  						
-  						_mysqlServer.rollback( function() {
-
-							callback( err );
-							
-						});
-
-  					} else {
-
-						_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-									
-							if ( error ) {
-
-								_mysqlServer.rollback( function() {
-
-									callback( error );
-									
-								});
-								//callback( error );
-
-							} else {
-
-								_mysqlServer.commit( function( errr ) {
-									
-									if (errr) { 
+							connection.query( query, [data, options.data.ID], function( error, results ) {
 												
-										_mysqlServer.rollback( function() {
+								if ( error ) {
 
-											callback( error );
-												
-										});
-											
-									} else {
+									callback( error.code );
 
-										callback( 'Equipment updated successfully.' );
-									}
+								} else {
+
+									callback( false, 'Occupation updated successfully.' );
 								
-								});
+								}
 
-								//callback( 'Equipment updated successfully.' );
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
 
-							}
+							});
 
-						});
+							break;
 
-					}
-				});/**/
+						case 'department':
 
-				//callback( 'User updated successfully...Nearly' );
+							query = "UPDATE department SET ? WHERE ID = ?";
+							data = {
+								'Name'		: options.data.Name
+							};
 
-				break;
+							connection.query( query, [data, options.data.ID], function( error, results ) {
+												
+								if ( error ) {
 
-			case 'occupation':
+									callback( error.code );
 
-				query = "UPDATE occupation SET ? WHERE ID = ?";
-				data = {
-					'Name'		: options.data.Name
-				};
+								} else {
 
-				_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-									
-					if ( error ) {
+									callback( false, 'Department updated successfully.' );
+								}
 
-						callback( error.code );
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
 
-					} else {
+							});
 
-						callback( false, 'Occupation updated successfully.' );
-					}
+							break;
+						
+						case 'supervisor':
 
-				});
+							query = "UPDATE supervisor SET ? WHERE ID = ?";
+							data = {
+								'userID'		: options.data.userID
+							};
 
-				break;
+							connection.query( query, [data, options.data.departmentID], function( error, results ) {
+												
+								if ( error ) {
 
-			case 'department':
+									callback( error.code );
 
-				query = "UPDATE department SET ? WHERE ID = ?";
-				data = {
-					'Name'		: options.data.Name
-				};
+								} else {
 
-				_mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-									
-					if ( error ) {
+									callback( false, 'Supervisor updated successfully.' );
+								}
 
-						callback( error.code );
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
 
-					} else {
+							});
 
-						callback( false, 'Department updated successfully.' );
-					}
+							break;
 
-				});
+						case 'notification':
 
-				break;
-			
-			case 'supervisor':
+							query = "UPDATE notifications SET ? WHERE ID = ?";
+							data = {
+								'status'		: options.data.status,
+								'message'		: options.data.message
+							};
 
-				query = "UPDATE supervisor SET ? WHERE ID = ?";
-				data = {
-					'userID'		: options.data.userID
-				};
+							connection.query( query, [data, options.data.ID], function( error, results ) {
+												
+								if ( error ) {
 
-				var dbbb = _mysqlServer.query( query, [data, options.data.departmentID], function( error, results ) {
-									
-					if ( error ) {
+									callback( error.code );
 
-						callback( error.code );
+								} else {
 
-					} else {
+									callback( false, 'Notification updated successfully.' );
+								}
 
-						callback( false, 'Supervisor updated successfully.' );
-					}
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
 
-				});
+							});
 
-				break;
+							break;
 
-			case 'notification':
+						default:
 
-				query = "UPDATE notifications SET ? WHERE ID = ?";
-				data = {
-					'status'		: options.data.status,
-					'message'		: options.data.message
-				};
+							callback( 'data type [' + options.type + '] not specified' );
 
-				var dbbb = _mysqlServer.query( query, [data, options.data.ID], function( error, results ) {
-									
-					if ( error ) {
+							// And done with the connection, it has been returned to the pool.
+							connection.release();
 
-						callback( error.code );
-
-					} else {
-
-						callback( false, 'Notification updated successfully.' );
+							break;
+							
 					}
 
-				});
+				}
 
-				break;
+			});
+		
+		} catch( e ) {
 
-			default:
+			callback( e );
 
-				callback( 'data type [' + options.type + '] not specified' );
-
-				break;
-				
 		}
 
 	}
@@ -1817,1042 +1956,200 @@
 
 		var deleteQuery = null;
 
-		switch( options.type ) {
+		try {
 
-			case 'employee':
-
-				deleteQuery = "DELETE FROM users WHERE ID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.ID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Employee deleted successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			case 'employee-equipment':
-
-				deleteQuery = "DELETE FROM usersMeta WHERE userID = ? AND equipmentID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.userID, options.data.equipmentID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Employee equipment removed successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			case 'equipment':
-
-				deleteQuery = "DELETE FROM equipment WHERE ID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.ID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Equipment deleted successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			case 'occupation':
-
-				deleteQuery = "DELETE FROM occupation WHERE ID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.ID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Occupation deleted successfully.' );
-
-						}
-
-				});
-
-
-				break;
-
-			case 'department':
-
-				deleteQuery = "DELETE FROM department WHERE ID = ?";
-
-				/**/
-				_mysqlServer.query( deleteQuery, [options.data.ID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Department deleted successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			case 'supervisor':
-
-				deleteQuery = "DELETE FROM supervisors WHERE userID = ? AND departmentID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.userID, options.data.departmentID ], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Supervisor deleted successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			case 'date':
-
-				deleteQuery = "DELETE FROM dates WHERE ID = ?";
-
-				_mysqlServer.query( deleteQuery, [options.data.ID], function( err, dbb ) {
-
-						if( err ) {
-
-							callback( err.code );
-
-						} else {
-
-
-							callback( false, 'Date deleted successfully.' );
-
-						}
-
-				});
-
-				break;
-
-			default:
-
-				callback( 'data type [' + options.type + '] not specified' );
-
-				break;
-				
-		}
-
-	}
-
-	/**
-     * @public
-     * 
-     * 
-     *      
-     * @param {Mysql._mysqlServer}
-     * @param {Object.options}
-	 * @param {Function.callback}
-	 * 
-     * @return {Object} 
-     * 
-     */
-	function DBReport(  _mysqlServer, type, options, callback  ) {
-
-		var query = null;
-		var result = [];
-		/**/
-		switch( type ) {
-
-			case 'account':
-
-				query = "";
-
-				// get all transactions
-				if( options.start_date == null && options.end_date == null ) {
-
-					query = 
-						"SELECT " +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*," +
-							"mighty5ive_transactions_fees.transaction_fee_type, " +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"LEFT JOIN " + 
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE client_id=? AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY datetime ASC ";
-
+			_mysqlServer.getConnection( function(err, connection) {
 					
-					_mysqlServer.query( query, [options.id], function( err, results ) {
-						
-						if ( err ) {
+				if( err ) {
 
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
+					callback( err.code );
 
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-					});
-
-				// get opening balance
-				} else if ( options.start_date !== null && options.end_date == null ) {
-
-					query =
-						"SELECT " +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_transactions_fees.transaction_fee_type, " +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"LEFT JOIN" +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN" +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN" +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN" +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN" +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN" +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE client_id=?  AND mighty5ive_transactions.datetime < ? AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY datetime ASC";					
-
-					_mysqlServer.query( query, [ options.id, options.start_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
-
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-
-					});
-
-				// get current balance
-				} else if ( options.start_date == null && options.end_date !== null ) {
-
-					query =
-						"SELECT " +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_transactions_fees.transaction_fee_type," +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value," +
-							"mighty5ive_accounts.account_name AS Owner," +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN "
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE client_id=?  AND mighty5ive_transactions.datetime < ? AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY datetime ASC";
-
-					_mysqlServer.query( query, [ options.id, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
-
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-					});
-
-				// get b2n period
-				} else if ( options.start_date !== null && options.end_date !== null ) {
-
-					query =
-						"SELECT " +	
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_transactions_fees.transaction_fee_type, " +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE mighty5ive_transactions.client_id=? AND mighty5ive_transactions.status = 1 AND mighty5ive_transactions.datetime BETWEEN ? AND ? " +
-						"ORDER BY datetime ASC";
-
-					_mysqlServer.query( query, [ options.id, options.start_date, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
-
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-					});
- 
 				} else {
-					callback('wtf!');
-				}
-				
-				break;
 
-			case 'vehicle':
+					switch( options.type ) {
 
-				query = "";
+						case 'employee':
 
-				// get all transactions
-				if( options.start_date == null && options.end_date == null ) {
+							deleteQuery = "DELETE FROM users WHERE ID = ?";
 
-					query =
-						"SELECT	" + 
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_vehicles.*, " +
-							"mighty5ive_vehicle_manufacturers.Name AS Manufacturer, " +
-							"mighty5ive_vehicle_types.Name AS VehicleType, " +
-							"mighty5ive_fuel_types.Name AS FuelType, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicles ON mighty5ive_transactions.registration_number = mighty5ive_vehicles.registration_number " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_manufacturers ON mighty5ive_vehicles.manufacturer = mighty5ive_vehicle_manufacturers.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_types ON mighty5ive_vehicles.vehicle_type = mighty5ive_vehicle_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_fuel_types ON mighty5ive_vehicles.fuel_type = mighty5ive_fuel_types.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE mighty5ive_vehicles.ID=? AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY mighty5ive_transactions.datetime ASC";
+							connection.query( deleteQuery, [options.data.ID], function( err, dbb ) {
 
-					_mysqlServer.query( query, [ options.id ], function( err, results ) {
-						
-						if ( err ) {
+								if( err ) {
 
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Employee deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-						} else {
+							break;
 
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
+						case 'employee-equipment':
+
+							deleteQuery = "DELETE FROM usersMeta WHERE userID = ? AND equipmentID = ?";
+
+							connection.query( deleteQuery, [options.data.userID, options.data.equipmentID], function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Employee equipment removed successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-							query = null;
+							break;
 
-						}
-					});
+						case 'equipment':
 
-				// get opening balance
-				} else if ( options.start_date !== null && options.end_date == null ) {
+							deleteQuery = "DELETE FROM equipment WHERE ID = ?";
 
-					query =
-						"SELECT	" +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_vehicles.*, " +
-							"mighty5ive_vehicle_manufacturers.Name AS Manufacturer, " +
-							"mighty5ive_vehicle_types.Name AS VehicleType, " +
-							"mighty5ive_fuel_types.Name AS FuelType, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicles ON mighty5ive_transactions.registration_number = mighty5ive_vehicles.registration_number " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_manufacturers ON mighty5ive_vehicles.manufacturer = mighty5ive_vehicle_manufacturers.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_types ON mighty5ive_vehicles.vehicle_type = mighty5ive_vehicle_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_fuel_types ON mighty5ive_vehicles.fuel_type = mighty5ive_fuel_types.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE mighty5ive_vehicles.ID=? AND mighty5ive_transactions.datetime < ? AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY datetime ASC";
+							connection.query( deleteQuery, [options.data.ID], function( err, dbb ) {
 
-					_mysqlServer.query( query, [ options.id, options.start_date ], function( err, results ) {
-						
-						if ( err ) {
+								if( err ) {
 
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Equipment deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-						} else {
+							break;
 
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
+						case 'occupation':
+
+							deleteQuery = "DELETE FROM occupation WHERE ID = ?";
+
+							connection.query( deleteQuery, [options.data.ID], function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+
+
+									callback( false, 'Occupation deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-							query = null;
+							break;
 
-						}
-					});
+						case 'department':
 
-				// get current balance
-				} else if ( options.start_date == null && options.end_date !== null ) {
+							deleteQuery = "DELETE FROM department WHERE ID = ?";
 
-					query = 
-						"SELECT " +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_vehicles.*, " +
-							"mighty5ive_vehicle_manufacturers.Name AS Manufacturer, " +
-							"mighty5ive_vehicle_types.Name AS VehicleType, " +
-							"mighty5ive_fuel_types.Name AS FuelType, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicles ON mighty5ive_transactions.registration_number = mighty5ive_vehicles.registration_number " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_manufacturers ON mighty5ive_vehicles.manufacturer = mighty5ive_vehicle_manufacturers.ID " +
-						"INNER JOIN " +
-							"mighty5ive_vehicle_types ON mighty5ive_vehicles.vehicle_type = mighty5ive_vehicle_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_fuel_types ON mighty5ive_vehicles.fuel_type = mighty5ive_fuel_types.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE mighty5ive_vehicles.ID=? AND mighty5ive_transactions.datetime < ?  AND mighty5ive_transactions.status = 1 " +
-						"ORDER BY datetime ASC";
+							connection.query( deleteQuery, [options.data.ID], function( err, dbb ) {
 
-					_mysqlServer.query( query, [ options.id, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
+								if( err ) {
 
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Department deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-						} else {
+							break;
 
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
+						case 'supervisor':
+
+							deleteQuery = "DELETE FROM supervisors WHERE userID = ? AND departmentID = ?";
+
+							connection.query( deleteQuery, [options.data.userID, options.data.departmentID ], function( err, dbb ) {
+
+								if( err ) {
+
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Supervisor deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-							query = null;
+							break;
 
-						}
-					});
+						case 'date':
 
-				// get b2n period
-				} else if ( options.start_date !== null && options.end_date !== null ) {
+							deleteQuery = "DELETE FROM dates WHERE ID = ?";
 
-					query = 
-						"SELECT " +
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_vehicles.*, " +
-							"mighty5ive_vehicle_manufacturers.Name AS Manufacturer, " +
-							"mighty5ive_vehicle_types.Name AS VehicleType, " +
-							"mighty5ive_fuel_types.Name AS FuelType, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_account_notification_types.ID AS notification_type_id " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"INNER JOIN " +  
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +  
-							"mighty5ive_vehicles ON mighty5ive_transactions.registration_number = mighty5ive_vehicles.registration_number " +
-						"INNER JOIN " +  
-							"mighty5ive_vehicle_manufacturers ON mighty5ive_vehicles.manufacturer = mighty5ive_vehicle_manufacturers.ID " +
-						"INNER JOIN " +  
-							"mighty5ive_vehicle_types ON mighty5ive_vehicles.vehicle_type = mighty5ive_vehicle_types.ID " +
-						"INNER JOIN " +  
-							"mighty5ive_fuel_types ON mighty5ive_vehicles.fuel_type = mighty5ive_fuel_types.ID " +
-						"LEFT JOIN " +  
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +  
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +  
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +  
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +  
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"LEFT JOIN " +
-							"mighty5ive_account_notification_types ON mighty5ive_accounts.notification_type = mighty5ive_account_notification_types.ID " +
-						"WHERE mighty5ive_vehicles.ID=? AND mighty5ive_transactions.status = 1 AND mighty5ive_transactions.datetime BETWEEN ? AND ? " +
-						"ORDER BY datetime ASC";
+							connection.query( deleteQuery, [options.data.ID], function( err, dbb ) {
 
-					_mysqlServer.query( query, [ options.id, options.start_date, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
+								if( err ) {
 
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
+									callback( err.code );
+
+								} else {
+
+									callback( false, 'Date deleted successfully.' );
+
+								}
+
+								// And done with the connection, it has been returned to the pool.
+								connection.release();
+
 							});
 
-						} else {
+							break;
 
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
+						default:
 
-							query = null;
+							callback( 'data type [' + options.type + '] not specified' );
 
-						}
-					});
- 
+							// And done with the connection, it has been returned to the pool.
+							connection.release();
+
+							break;
+							
+					}
+
 				}
 
-				break;
+			});
 
-			case 'transaction':
+		} catch( e ) {
 
-				query = "";
+			callback( e );
 
-				// get all transactions
-				if( options.start_date == null && options.end_date == null ) {
-
-					query = 
-						"SELECT " +	
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_transactions_fees.transaction_fee_type, " +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value, " +
-							"mighty5ive_transactions_fees_type.Name AS Transaction_fee_name, " +
-							"mighty5ive_account_services.name AS transaction_type_name, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees_type ON mighty5ive_transactions_fees.transaction_fee_type = mighty5ive_transactions_fees_type.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"ORDER BY datetime ASC";
-
-					_mysqlServer.query( query, [], function( err, results ) {
-						
-						if ( err ) {
-
-							result.push( err );
-							callback( result );
-
-						} else {
-
-							callback( results );
-
-							query = null;
-
-						}
-					});
-
-				// get opening balance
-				} else if ( options.start_date !== null && options.end_date == null ) {
-
-					_mysqlServer.query( query, [ options.start_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							result.push( err );
-							callback( result );
-
-						} else {
-
-							callback( results );
-
-							query = null;
-
-						}
-					});
-
-				// get current balance
-				} else if ( options.start_date == null && options.end_date !== null ) {
-
-					
-
-					_mysqlServer.query( query, [ options.end_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							result.push( err );
-							callback( result );
-
-						} else {
-
-							callback( results );
-
-							query = null;
-
-						}
-					});
-
-				// get b2n period
-				} else if ( options.start_date !== null && options.end_date !== null ) {
-
-					query = 
-						"SELECT " +	
-							"mighty5ive_transactions.*, " +
-							"mighty5ive_transactions_fuel.*, " +
-							"mighty5ive_transactions_oil.*, " +
-							"mighty5ive_transactions_toll.*, " +
-							"mighty5ive_transactions_fees.transaction_fee_type, " +
-							"mighty5ive_transactions_fees.value AS transaction_fee_value, " +
-							"mighty5ive_transactions_fees_type.Name AS Transaction_fee_name, " +
-							"mighty5ive_account_services.name AS transaction_type_name, " +
-							"mighty5ive_account_services.id AS service_id, " +
-							"mighty5ive_transactions_type.Name AS Type, " +
-							"mighty5ive_accounts.account_name AS Owner, " +
-							"mighty5ive_accounts.contact_no AS Contact, " +
-							"mighty5ive_accounts.email AS Email, " +
-							"mighty5ive_account_types.Name AS AccountType, " +
-							"mighty5ive_account_types.ID AS AccountTypeID, " +
-							"mighty5ive_account_types.Rate AS AccountRate, " +
-							"mighty5ive_account_modules.Name AS ModuleName, " +
-							"mighty5ive_account_modules.ID AS AccountModuleID " +
-						"FROM " +
-							"mighty5ive_transactions " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fuel ON mighty5ive_transactions.id = mighty5ive_transactions_fuel.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_oil ON mighty5ive_transactions.id = mighty5ive_transactions_oil.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_toll ON mighty5ive_transactions.id = mighty5ive_transactions_toll.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees ON mighty5ive_transactions.id = mighty5ive_transactions_fees.transaction_id " +
-						"LEFT JOIN " +
-							"mighty5ive_transactions_fees_type ON mighty5ive_transactions_fees.transaction_fee_type = mighty5ive_transactions_fees_type.ID " +
-						"LEFT JOIN " +
-							"mighty5ive_account_services ON mighty5ive_transactions.service_id = mighty5ive_account_services.id " +
-						"INNER JOIN " +
-							"mighty5ive_transactions_type ON mighty5ive_transactions.transaction_type = mighty5ive_transactions_type.ID " +
-						"INNER JOIN " +
-							"mighty5ive_accounts ON mighty5ive_transactions.client_id = mighty5ive_accounts.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_types ON mighty5ive_accounts.account_type = mighty5ive_account_types.ID " +
-						"INNER JOIN " +
-							"mighty5ive_account_modules ON mighty5ive_accounts.account_module = mighty5ive_account_modules.ID " +
-						"WHERE mighty5ive_transactions.datetime BETWEEN ? AND ? " +
-						"ORDER BY datetime ASC";
-
-
-					_mysqlServer.query( query, [ options.start_date, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							result.push( err );
-							callback( result );
-
-						} else {
-
-							callback( results );
-
-							query = null;
-
-						}
-					});
- 
-				}
-				
-
-				break;
-
-			case 'notification':
-
-				query = "";
-
-				// get all
-				if( options.start_date == null && options.end_date == null ) {
-
-					_mysqlServer.query( query, [], function( err, results ) {
-						
-						if ( err ) {
-
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
-
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-					});
-
-				// get b2n period
-				} else if ( options.start_date !== null && options.end_date !== null ) {
-
-					
-
-					_mysqlServer.query( query, [ options.start_date, options.end_date ], function( err, results ) {
-						
-						if ( err ) {
-
-							callback({
-								'error': true,
-								'type': "report",
-								'data': err
-							});
-
-						} else {
-
-							callback({
-								'error': false,
-								'type': "report",
-								'data': results
-							});
-
-							query = null;
-
-						}
-					});
- 
-				}
-
-				break;
-
-			default:
-
-				break;
 		}
-		/**/
 
 	}
 

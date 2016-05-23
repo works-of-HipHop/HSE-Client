@@ -1,0 +1,57 @@
+	<div class="row">
+		<div class="columns ten">
+			<br />
+			<h1 class="tl mask-money uppercase"><span class="badge badge-success">{{active_employees.length}}</span>&nbsp;Employees</h1>
+		</div>
+		<div class="columns five">
+			<!--
+			<div class="btn-group fr">
+				<button type="button" data-ng-click="export( 'preview-employees', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+					<span class="icon-file-pdf alert-error"></span>
+				</button>
+				<button type="button" data-ng-click="export( 'preview-employees', 'csv' )" class="btn btn-large" data-title="Export Excel">
+					<span class="icon-file-excel alert-success"></span>
+				</button>
+			</div>
+			-->
+		</div>
+		<div class="columns one"></div>
+	</div>
+
+	<br />
+	<hr />
+	<br />
+
+	<table id="employees-equipment-table" class="table footable hoverable" data-ng-if="active_employees.length > 0">
+		<thead>
+			<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;border-right:1px solid #ddd;">
+				<th class="tc" colspan="5">Employee Details</th>
+			</tr>
+			<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;border-right:1px solid #ddd;">
+				<th style="border-top:1px solid #ddd;" data-sid="displayName"colspan="1">Name</th>
+				<th data-sid="employeeNumber">Employee No.:</th>
+				<th data-sid="idNumber">ID Number</th>
+				<th data-sid="userOccupation">Occupation</th>
+				<th data-sid="departmentName">Department</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="tl" bindonce dir-paginate="data in active_employees | itemsPerPage: 10 track by data.ID" pagination-id="employees-equipment-table">
+
+				<td class="mask-money uppercase" bo-text="data.displayName"></td>
+				<td class="mask-money uppercase" bo-text="data.employeeNumber"></td>
+				<td class="mask-money" bo-text="data.idNumber"></td>
+				<td class="mask-money" bo-text="data.userOccupation"></td>
+				<td class="mask-money" bo-text="data.departmentName"></td>
+		
+			</tr>
+		</tbody>
+		<tfoot class="footable-pagination tc">
+			<tr>
+				<td colspan="5">
+					<dir-pagination-controls pagination-id="employees-equipment-table"></dir-pagination-controls>
+				</td>
+			</tr>
+		</tfoot>
+					
+	</table>

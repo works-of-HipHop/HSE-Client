@@ -1,0 +1,27 @@
+ <div class="pagination tc">
+
+	 <div class="btn-group" data-ng-if="1 < pages.length || !autoHide">
+
+		<button class="btn" data-ng-if="boundaryLinks" data-ng-click="setCurrent(1)" data-ng-class="{ disabled : pagination.current == 1 }">
+			<i class="icon-backward"></i>
+		</button>
+
+		<button class="btn" data-ng-if="directionLinks" data-ng-click="setCurrent(pagination.current - 1)" data-ng-class="{ disabled : pagination.current == 1 }">
+			<i class="icon-chevron-left"></i>
+		</button>
+
+		<button class="btn" data-ng-repeat="pageNumber in pages track by tracker(pageNumber, $index)" data-ng-click="setCurrent(pageNumber)" data-ng-class="{ active : pagination.current == pageNumber, disabled : pageNumber == '...' }">
+			{{ pageNumber }}
+		</button>
+
+		<button class="btn" data-ng-if="directionLinks" data-ng-click="setCurrent(pagination.current + 1)" data-ng-class="{ disabled : pagination.current == pagination.last }">
+			<i class="icon-chevron-right"></i>
+		</button>
+
+		<button class="btn" data-ng-if="boundaryLinks" data-ng-click="setCurrent(pagination.last)" data-ng-class="{ disabled : pagination.current == pagination.last }">
+			<i class="icon-forward"></i>
+		</button>
+
+	</div>
+
+</div>

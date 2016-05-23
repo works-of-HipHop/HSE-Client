@@ -121,7 +121,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in hse_notifications | paginate:50 track by data.ID">
+							<!--<tr class="tl" bindonce data-ng-repeat="data in hse_notifications | paginate:50 track by data.ID">-->
+							<tr class="tl" bindonce dir-paginate="data in hse_notifications | itemsPerPage: 25" pagination-id="notifications-pending">
 								
 								<td class="mask-money tc" style="width:50px;">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
@@ -146,7 +147,7 @@
 								<td class="tl"colspan="3">
 									<!-- -->
 									<select 
-										id="batchActions-linked-cards" 
+										id="batchActions-pending-notifications" 
 										disabled
 										data-ng-model="batch_actions"
 										data-ng-change="batchActions()">
@@ -157,7 +158,9 @@
 									</select>
 									<!-- -->
 								</td>
-								<td colspan="6"><paginator></paginator></td>
+								<td colspan="6">
+									<dir-pagination-controls pagination-id="notifications-pending"></dir-pagination-controls>
+								</td>
 							</tr>
 						</tfoot>
 					

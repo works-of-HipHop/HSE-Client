@@ -1,0 +1,110 @@
+	
+	<div class="row">
+		<div class="columns sixteen">
+			<h1 class="tl mask-money uppercase">EMPLOYEE DETAILS FOR: <strong>{{active_employee.firstName}} {{active_employee.lastName}} ({{active_employee.idNumber}}) - {{active_employee.userOccupation}} in {{active_employee.departmentName}}</strong></h1>
+			
+		</div>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="columns sixteen">
+			<div class="row">
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="userTypeID">Type of Account</label>
+					<select 
+						id="userTypeID"
+						name="userTypeID" 
+						required="required" 
+						data-ng-disabled="true"
+						data-ng-model="active_employee.userTypeID"
+						data-ng-options="a.ID as a.Name for a in hse_data.userType">
+							<option value="">Select an employee type&hellip;</option>
+					</select>
+				</div>
+				<div class="columns eleven"></diV>
+			</div>
+			<br />
+			<div class="row">
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="occupationID">Occupation</label>
+					<select 
+						id="occupationID"
+						name="occupationID" 
+						required="required"
+						data-ng-disabled="true"
+						data-ng-model="active_employee.occupationID"
+						data-ng-options="a.ID as a.Name for a in hse_data.occupation">
+							<option value="">Select a Occupation&hellip;</option>
+					</select>
+				</div>
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="departmentID">Department</label>
+					<select 
+						id="departmentID"
+						name="departmentID" 
+						required="required"
+						data-ng-disabled="true"
+						data-ng-model="active_employee.departmentID"
+						data-ng-options="a.ID as a.Name for a in hse_data.department">
+							<option value="">Select a Department&hellip;</option>
+					</select>
+				</div>
+				<div class="columns six"></diV>
+			</div>
+			<br />
+			<div class="row">
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="firstName">First Name</label>
+					<input 
+						type="text"
+						readonly
+						data-ng-model="active_employee.firstName"
+						id="firstName" name="firstName" 
+						required="required" placeholder="" data-ng-minlength="1" />
+				</div>
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="lastName">Last Name</label>
+					<input 
+						type="text"
+						readonly
+						data-ng-model="active_employee.lastName"
+						id="lastName" name="lastName" 
+						required="required" placeholder="" data-ng-minlength="3" />
+				</div>
+				<div class="columns six"></diV>
+			</div>
+			<br />
+			<div class="row">
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="idNumber">I.D. Number</label>
+					<input 
+						type="text"
+						readonly
+						id="idNumber"  name="idNumber"
+						data-ng-model="active_employee.idNumber"
+						placeholder="ID Number" data-ng-minlength="3" data-ng-maxlength="13" required="required" />
+				</div>
+				<div class="columns five">
+					<label class="FiraFont uppercase" for="employeeNumber">Employee No.</label>
+					<input 
+						type="text"
+						readonly
+						name="employeeNumber"
+						id="employeeNumber"
+						data-ng-model="active_employee.employeeNumber"
+						data-ng-min=length"3" maxlength="9" placeholder="Employee number"  />
+				</div>
+				<div class="columns six">
+					<label class="FiraFont uppercase" for="emailAddress">Email Address</label>
+					<input 
+						type="text"
+						readonly
+						name="emailAddress"
+						id="emailAddress" class="input-large"
+						data-ng-model="active_employee.emailAddress"
+						placeholder="Email Address"  />
+				</diV>
+			</div>
+		</div>
+	</div>
+	<hr />

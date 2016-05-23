@@ -30,7 +30,7 @@
 					<!-- help-tutorial
 					<a
 						href="javascript:;"
-						class="help-trigger"
+						class="help-trigger help-tutorial full-rounded"
 						data-ng-click="goRefresh()" title="Refresh Application">
 							<span class="icon-spinner" style="left:-6px;top:8px;"></span>
 					</a>
@@ -59,11 +59,11 @@
 				data-ng-cloak
 				class="mask-money fr"
 				style="margin-bottom:0;padding:1em;color:#444;text-shadow:1px 1px 1px #fff;margin-right: 2em;">
-				HSE v{{hse_version_number}}&nbsp;<small style="font-size:0.8em;">({{hse_running_time | millSecondsToTimeString}})</small><!--<small style="font-size:0.8em;">({{hse_running_time | millSecondsToTimeString}})</small>-->
+				HSE v{{appVersion.full}}&nbsp;::&nbsp;{{hse_currentDate | date: 'yyyy-MMM-dd, EEEE'}}&nbsp;<small style="font-size:0.8em;">({{hse_running_time | millSecondsToTimeString}})</small>
 			</p>
 			
 			<!-- [BRANDING] -->
-			<div data-ng-switch on="renderPath[ 0 ]" style="position: relative;display: block;height: 150px;width: 100%;">
+			<div data-ng-switch data-ng-cloak on="renderPath[ 0 ]" style="position: relative;display: block;height: 150px;width: 100%;">
 
 				<!-- FILE EXPLORER -->
 				<div data-ng-switch-when="browse">
@@ -530,56 +530,12 @@
 											<br /><br /><br /><br />
 
 											<h1 class="FiraFont tc" style="font-size:2em;text-shadow: 0 1px 0 #fff;">
-												Welcome to the Phola Coal HSE
+												Welcome to Phola Coal HSE
 											</h1>
 
-											<br /><br /><br /><br /><br />
+											<br /><br /><br />
 
 											<div data-ui-form-login></div>
-
-											<!-- WORKING HSE INTRO FOR CLIENTS
-
-											<div 
-												class="alert alert-block alert-info tc FiraFont" 
-												style="width:60%;margin:1em auto;" 
-												data-ng-show="networkPaths.length == 0">
-
-													<p 
-														style="font-size:2em;line-height:2.5em;">
-															It appears the network location is not available or has been misconfigured.<br />Please contact the System Administrator.
-													</p>
-													<br />
-													<a 
-														href="javascript:;" 
-														class="btn btn-large macdaddy-rounded uppercase" 
-														style="display:inline-block;border-radius:999px;padding:1em 2em;"
-														data-ng-click="openPage('settings')" data-title="Settings">Configure
-													</a>
-													<br /><br />
-											</div>
-											<div id="mainEntry" class="row tc" style="position:relative;" data-ng-hide="networkPaths.length == 0">
-												
-												<span 
-													style=""
-													on-proceed="tourStepComplete()"
-													tourtip-element=".menu-trigger"
-													tourtip-container-element="#mainEntry"
-													tourtip-step="0"
-													tourtip-backDrop = "true"
-													tourtip-placement="left"
-													tourtip-next-label="Next"
-													tourtip-offset-vertical="10"
-    												tourtip-offset-horizontal="26"
-													tourtip="Click / Tap on the Green Button to view the option screen."></span>
-												
-												<button 
-													type="button" 
-													id="trigger" 
-													class="FiraFont menu-trigger btn btn-large btn-success btn-block uppercase" 
-													data-ng-click="goToHome()" style="font-size:4em; width:50%;">Open</button>
-												
-											</div>
-											-->
 											
 											<br /><br />
 

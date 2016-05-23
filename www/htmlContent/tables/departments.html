@@ -25,18 +25,6 @@
 
 					<br /><br />
 
-					<!--
-					<br />
-					<div class="row">
-						<div claas="columns sixteen">
-							<div class="btn-group">
-								<button type="button" class="macdaddy-rounded cd-btn FiraFont uppercase">Search</button>
-							</div>
-						</div>
-					</div> -->
-					
-					<br />
-					
 					<div data-ui-form-department-new></div>
 
 					<hr />
@@ -48,7 +36,7 @@
 					</div>
 					<table id="departments-table" class="table footable hoverable" data-ng-if="hse_departments.length > 0">
 						<thead>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;">
 								<th style="width:50px;">
 									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
 										<span class="icon-checkmark3 alert-success"></span>
@@ -57,7 +45,7 @@
 								<th class="tc" colspan="3">Department Details</th>
 								<th colspan="1" style="border:1px solid #ddd;">Action</th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;">
 								<th colspan="1"></th>
 								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="Name" data-ng-click="setSortExpression('Name')" colspan="1">Name</th>
 								<!--
@@ -69,7 +57,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in hse_departments | paginate:50 track by data.ID">
+							<!-- <tr class="tl" bindonce data-ng-repeat="data in hse_departments | paginate:50 track by data.ID"> -->
+							<tr class="tl" bindonce dir-paginate="data in hse_departments | itemsPerPage: 10 track by data.ID" pagination-id="departments-table">
 								
 								<td class="mask-money tc" style="width:50px;">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
@@ -91,7 +80,7 @@
 								</td>
 								-->
 								<td colspan="1" class="mask-money uppercase">
-									<span bo-text="data.totalEmployees"></span>
+									<button type="button" class="btn btn-link" bo-text="data.totalEmployees" data-ng-disabled="data.totalEmployees <= 0" data-ng-click="openDialog('preview-employees', data.ID)"></button>
 								</td>
 								<td colspan="1" class="mask-money uppercase">
 									{{data.supervisors.length}}
@@ -122,12 +111,18 @@
 									</select>
 									-->
 								</td>
-								<td colspan="5"><paginator></paginator></td>
+								<td colspan="5">
+									<dir-pagination-controls pagination-id="departments-table"></dir-pagination-controls>
+								</td>
 							</tr>
 						</tfoot>
 					
 					</table>
 
+					<script type="text/ng-template" id="previewEmployees">
+						<div data-ui-modal-equipment-employees></div>
+					</script>
+					
 					<script type="text/ng-template" id="departmentActions">
 						<div data-ui-modal-department-actions></div>
 					</script>

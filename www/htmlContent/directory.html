@@ -141,13 +141,9 @@
 										<div class="columns sixteen">
 											
 											<ul class="folderList unstyled">
-												<!--
-												<li class="paging" data-ng-if="activeFolder.length > 0">
-													<br />
-													<data-paginator></data-paginator>
-													<br />
-												</li> -->
-												<li data-path="{{dbFolder.path}}" data-ng-class="{ 'alert-success folder-li': dbFolder.isFolder == true, 'alert-error': dbFolder.isFolder == false, 'file-pdf': dbFolder.ext == 'pdf', 'file-doc': dbFolder.ext == 'doc' }" bindonce data-ng-repeat="dbFolder in activeFolder | paginate:40">
+									
+												<!-- <li data-path="{{dbFolder.path}}" data-ng-class="{ 'alert-success folder-li': dbFolder.isFolder == true, 'alert-error': dbFolder.isFolder == false, 'file-pdf': dbFolder.ext == 'pdf', 'file-doc': dbFolder.ext == 'doc' }" bindonce data-ng-repeat="dbFolder in activeFolder | paginate:40"> -->
+												<li data-path="{{dbFolder.path}}" data-ng-class="{ 'alert-success folder-li': dbFolder.isFolder == true, 'alert-error': dbFolder.isFolder == false, 'file-pdf': dbFolder.ext == 'pdf', 'file-doc': dbFolder.ext == 'doc' }" bindonce dir-paginate="dbFolder in activeFolder | itemsPerPage: 40" pagination-id="file-browser">
 													<button
 														type="button"
 														data-ng-if="dbFolder.isFolder == true"
@@ -166,18 +162,14 @@
 												</li>
 												<li class="empty-folder" style="border:none !important;" data-ng-if="activeFolder.length == 0">
 													<br /><br />
-													<!--<button type="button" class="btn btn-block FiraFont">Go Back</button> -->
+													<!-- Go back button perhaps -->
 													<br /><br />
 												</li>
 												<li class="paging" data-ng-if="activeFolder.length > 0">
-													<data-paginator></data-paginator>
+													<dir-pagination-controls pagination-id="file-browser"></dir-pagination-controls>
 													<br />
 												</li>
-												<!--
-												<li class="paging" data-ng-if="activeFolder.length <= 0">
-													<h3 class="tc FiraFont">Folder is Empty</h3>
-													<br />
-												</li> -->
+
 												<br /><br />
 												<div class="spinner tc" data-ng-if="!activeFolder" data-ng-hide="activeFolder.length <= 0" style="display:block;padding:2em;">
 													<br /><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><br /><br />

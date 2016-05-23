@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. All rights reserved.
+ * Copyright (c) 1988 - Present @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"), 
@@ -20,9 +20,6 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, evil:true */
-/*global window, document:true, CollectionUtils:true */
 
 window.setTimeout( function () {
 	

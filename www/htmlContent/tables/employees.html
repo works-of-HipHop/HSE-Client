@@ -1,25 +1,33 @@
-					<div class="row">
-						<div class="columns twelve" >
-							<h3 class="FiraFont uppercase mask-money">
-								<strong>Employees</strong>&nbsp;<span class="badge badge-success">{{hse_employees.length}}</span>
-							</h3>
-						</div>
-						<div class="columns three">
-							
-							
-						</div>
-					</div>
-					<br />
+					
 					<div class="row">
 						<div class="columns sixteen">
 
-							<div data-ui-form-employee-new></div>
+							<ang-accordion id="employee-form-accordion" one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+								<!-- ALREADY EXPIRED -->
+								<collapsible-item class="alert-info" title="Add New Employee" initially-open="false">
+
+									<div data-ui-form-employee-new></div>
+
+								</collapsible-item>
+
+							</ang-accordion>
 
 							<hr />
 
 						</div>
 					</div>
 
+					<br />
+
+					<div class="row">
+						<div class="columns sixteen" >
+							<h3 class="FiraFont uppercase mask-money">
+								<strong>Employees</strong>&nbsp;<span class="badge badge-success">{{hse_employees.length}}</span>
+							</h3>
+						</div>
+					</div>
+					
 					<br />
 
 					<div class="row">
@@ -101,16 +109,7 @@
 						</div>
 						
 					</div>
-					<!--
-					<br />
-					<div class="row">
-						<div claas="columns sixteen">
-							<div class="btn-group">
-								<button type="button" class="macdaddy-rounded cd-btn FiraFont uppercase">Search</button>
-							</div>
-						</div>
-					</div> -->
-					
+										
 					<br /><br />
 					
 					<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_employees.length <= 0">
@@ -118,7 +117,7 @@
 					</div>
 					<table id="employees-table" class="table footable hoverable" data-ng-if="hse_employees.length > 0">
 						<thead>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border:1px solid #ddd;">
 								<th style="width:50px;">
 									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
 										<span class="icon-checkmark3 alert-success"></span>
@@ -127,7 +126,7 @@
 								<th class="tc" colspan="6">Employee Details</th>
 								<th colspan="2" style="border:1px solid #ddd;">Action</th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border:1px solid #ddd;">
 								<th colspan="1"></th>
 								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="firstName" data-ng-click="setSortExpression('firstName')" colspan="1">First Name</th>
 								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="lastName" data-ng-click="setSortExpression('lastName')" colspan="1">Last Name</th>
@@ -140,7 +139,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in hse_employees | paginate:50 track by data.ID">
+							<!--<tr class="tl" bindonce data-ng-repeat="data in hse_employees | paginate:50 track by data.ID">-->
+							<tr class="tl" bindonce dir-paginate="data in hse_employees | itemsPerPage: 25 track by data.ID" pagination-id="employees-table">
 								
 								<td class="mask-money tc" style="width:50px;">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
@@ -157,7 +157,7 @@
 								<td class="mask-money" bo-text="data.userOccupation"></td>
 								<td class="mask-money" bo-text="data.departmentName"></td>
 								<td class="mask-money" bo-text="data.emailAddress"></td>
-								<td class="mask-money" colspan="2" style="width:50px;">
+								<td class="mask-money tc" colspan="2" style="width:50px;">
 									<button 
 										type="button" 
 										class="btn btn-info mask-money uppercase" 
@@ -183,7 +183,9 @@
 									</select>
 									-->
 								</td>
-								<td colspan="9"><paginator></paginator></td>
+								<td colspan="9">
+									<dir-pagination-controls pagination-id="employees-table"></dir-pagination-controls>
+								</td>
 							</tr>
 						</tfoot>
 					

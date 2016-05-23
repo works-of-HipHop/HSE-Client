@@ -89,16 +89,19 @@
 															</tr>
 														</tbody>
 													</table>
+
 													<hr />
+
 													<!--
 													<div class="alert alert-block alert-info FiraFont tc" data-ng-if="hse_employees.length <= 0">
 														<p class="FiraFont">There are no Supervisors assigned to this deparment at the moment.</p>
 													</div>
 													-->
+
 													<table id="equipment-table-link" class="table footable hoverable" data-ng-if="hse_employees.length > 0">
 																				
 														<thead>
-															<tr class="tl uppercase mask-money" style="cursor:pointer;">
+															<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;border-right:1px solid #ddd;">
 																<th class="tc" style="width:50px;"></th>
 																<th class="sortable" data-sid="Name" data-ng-click="setSortExpression('Name')">Name</th>
 																<th class="sortable" data-sid="PTODate" data-ng-click="setSortExpression('PTODate')">ID Number</th>

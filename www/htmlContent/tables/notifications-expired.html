@@ -122,7 +122,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in hse_notifications | paginate:50 track by data.ID">
+							<!--<tr class="tl" bindonce data-ng-repeat="data in hse_notifications | paginate:50 track by data.ID">-->
+							<tr class="tl" bindonce dir-paginate="data in hse_notifications | itemsPerPage: 25" pagination-id="notifications-expired">
 								
 								<td class="mask-money tc" style="width:50px;">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
@@ -148,7 +149,7 @@
 								<td class="tc"colspan="3">
 									<!-- -->
 									<select 
-										id="batchActions-linked-cards" 
+										id="batchActions-expired-notifications" 
 										disabled
 										data-ng-model="batch_actions"
 										data-ng-change="batchActions()">
@@ -159,7 +160,9 @@
 									</select>
 									<!-- -->
 								</td>
-								<td colspan="6"><paginator></paginator></td>
+								<td colspan="6">
+									<dir-pagination-controls pagination-id="notifications-expired"></dir-pagination-controls>
+								</td>
 							</tr>
 						</tfoot>
 					
@@ -168,8 +171,3 @@
 					<script type="text/ng-template" id="equipmentActions">
 						<div data-ui-modal-notifications-actions></div>
 					</script>
-					<!--
-					<script type="text/ng-template" id="editEquipmentInline">
-						<div data-ui-form-edit-equipment></div>
-					</script>
-					-->

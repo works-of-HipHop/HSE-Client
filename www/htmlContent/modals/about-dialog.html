@@ -1,8 +1,21 @@
 	<br />
-	<h1 class="dialog-title FiraFont tc"><img style="width:150px;height:auto;" src="./public/images/bg/phola_logo.png" alt="Phola Coal HSE" title="Phola Coal HSE" />&nbsp;<small class="tr mask-money uppercase">version 1.2.1</small></h1>
+	<h1 class="dialog-title FiraFont tl"><img style="width:150px;height:auto;" src="./public/images/bg/phola_logo.png" alt="Phola Coal HSE" title="Phola Coal HSE" /></h1>
+	<br />
 	<hr />
 	<div class="about-text">
 		<div class="about-info tc">
-			<p class="app-credits">&copy; 2015 5<span>i</span>ve <span>Design</span> Studio (Pty) Ltd. on behalf of Phola Coal HSE.</p>
+			<small class="tr mask-money uppercase fl">version 2.0</small>
+
+			<div class="fr" data-ng-switch on="updatesReady"> 
+				<button type="button" class="btn btn-success fr mask-money uppercase" data-ng-switch-when="true" data-ng-click="installUpdates()">
+					Install updates
+				</button>
+
+				<button type="button" class="btn fr mask-money uppercase" data-ng-switch-default data-ng-click="checkForUpdates()">
+					Check for updates
+				</button>
+			</div>
+			<br />
+			<!-- <p class="app-credits">&copy; 2013 - Present 5<span>i</span>ve <span>Design</span> Studio (Pty) Ltd. on behalf of Phola Coal HSE.</p> checkForUpdates -->
 		</div>
 	</div>

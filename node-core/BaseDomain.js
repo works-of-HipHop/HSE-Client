@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 - 2016 @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
+ * Copyright (c) 1988 - Present @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"), 
@@ -26,24 +26,45 @@
 	"use strict";
 
 	var os 					= require("os"),
-		fs 					= require("fs"),
 		path 				= require('path'),
 		nodeUtil 			= require("util"),			
 		DBMine 				= require("./QDb"),
-		PdfPrinter 			= require('./thirdparty/pdfmake'),
 		Logger 				= require("./Logger"),
 		Launcher 			= require("./Launcher"),
-		xlsx 				= require("./thirdparty/xlsx"),
+
+		//xlsx 				= require("./thirdparty/xlsx"),
 		mysql				= require('./thirdparty/mysql'),
 		exec 				= require("child_process").exec,
 		GetMac				= require("./thirdparty/getmac"),
 		ConnectionManager 	= require("./ConnectionManager"),
-		es 					= require('./thirdparty/event-stream'),
+		PdfPrinter 			= require('./thirdparty/pdfmake'),
+		request 			= require('./thirdparty/request'),
+		fs 					= require("./thirdparty/fs-extra"),
 		mkdirp 				= require('./thirdparty/node-mkdirp'),
-		//shell 				= require('./thirdparty/node-powershell'),
-		xmlbuilder 			= require('./thirdparty/node-xml'),
 		Service 			= require('./thirdparty/node-windows').Service,
-		autoupdater 		= require('./thirdparty/auto-updater/auto-updater.js');
+		EventLogger 		= require('./thirdparty/node-windows').EventLogger;
+
+	var Q5log 	= new EventLogger('Q-Not5y');
+	var svc 	= new Service({
+		name:'Q-Not5y',
+		description: 'The Q-5 Server for HSE notifications and updates.',
+		script: path.join( __dirname, '../', 'auto-update/service.js'),
+		env: [{
+				name: "HOME",
+				value: process.env["USERPROFILE"] // service is now able to access the user who created its' home directory
+			},
+			{
+				name: "TEMP",
+				value: path.join( process.env["USERPROFILE"],"/temp" ) // use a temp directory in user's home directory
+			},
+			{
+				name: "HSEEXE",
+				value: path.join( __dirname, '../', 'HSE-Client.exe' ) // use a temp directory in user's home directory
+			}
+		],
+		wait: 2,
+		grow: .5
+	});
 
     /**
      * @private
@@ -56,33 +77,32 @@
      * @private
      * @type MySQL Server
      */
-	var _mysqlServer = null,
-		/** LIVE **/
-		_SQL_host 		= '192.168.17.50',
-		_SQL_port 		= 3306,
-		_SQL_user 		= 'MyHSE',
-		_SQL_pword 		= 'BXDFsHR',
-		_SQL_dbname		= 'phse',
-		/** /
-    	_SQL_host 		= '197.189.253.71',
-		_SQL_port 		= 3306,
-		_SQL_user 		= 'fdstudio_phola',
-		_SQL_pword 		= 'z^BN+Xh,Z3[S',
-		_SQL_dbname		= 'fdstudio_hse_live',
-		/**/
+    var _mysqlServer 	= null,
+    	_SQL_db_config 	= {};
+
+	try {
+
+		var DBconfigObj = fs.readJsonSync( path.join( __dirname, '../', "config.json" ) );
+
 		_SQL_db_config 	= {
-			//socketPath: address.port,
-			host     			: _SQL_host,
-			user     			: _SQL_user,
-			password 			: _SQL_pword,
-			database 			: _SQL_dbname,
-			debug 				: true,
+			//socketPath 		: address.port,
+			host     			: DBconfigObj.production.host,
+			user     			: DBconfigObj.production.user,
+			password 			: DBconfigObj.production.password,
+			database 			: DBconfigObj.production.database,
+			debug 				: false,
 			multipleStatements 	: true,
 			insecureAuth 		: true
 			//stringifyObjects	: true
 		};
-	
-	_mysqlServer = mysql.createConnection( _SQL_db_config );
+
+		_mysqlServer = mysql.createPool( _SQL_db_config );
+
+	} catch (e) {
+
+		console.log('config.json error:', e);
+
+	}
 
     /**
      * @private
@@ -231,10 +251,10 @@
      * @param {type.<string>} filetype
      * @param {printer.<string>} printer name
      * @param {exe.<string>} path to program
-	 * @param {path.<string>} path to load
+	 * @param {spath.<string>} path to load
      * Print PDF FILE
      */
-	function cmdPrint( type, exe, path, callback ) {
+	function cmdPrint( type, exe, spath, callback ) {
 
 		cmdDefaultPrinter( function(err, printer) {
 
@@ -244,96 +264,65 @@
 			
 			} else {
 
-				cmdOSArchitecture( function(error, arch) {
+				var printerPath = path.join( __dirname, '../', 'www/thirdparty/apps/SumatraPDF.exe');
 
-					if( error === false ) {
+				switch ( type ) {
 
-						if( arch == "64-bit" ) {
+					case 'pdf':
 
-							var printerPath = "%PROGRAMFILES(x86)%/HSESPR~1/www/thirdparty/apps/SumatraPDFx64.exe";
+						//for adobe
+						//var printIt = '"' + exe + '" /T "' + spath + '" "' + printer + '"';
+						var printIt = '"' + printerPath + '" -print-to-default "' + spath + '"';
 
+						break;
 
-						} else if( arch == "32-bit" ) {
+					case 'txt':
 
-							var printerPath = "%PROGRAMFILES%/HSESPR~1/www/thirdparty/apps/SumatraPDF.exe";
+						//var printIt = '"' + exe + '" /N /T "' + spath + '" "' + printer + '"';
+						var printIt = 'print /d:"' + printer + '" "' + spath + '"';
 
-						} else {
+						break;
 
-							var printerPath = exe;
+					case 'doc':
 
-						};
+						//var printIt = '"' + exe + '" /q /n "' + spath + '" "' + printer + '" /mFileExit';
+						var printIt = 'print /d:"' + printer + '" "' + spath + '"';
 
-						//callback(printerPath);
+						break;
 
-						/**/
+					case 'xls':
 
-						switch ( type ) {
+						//var printIt = '"' + exe + '" /q /n "' + spath + '" "' + printer + '" /mFileExit';
+						var printIt = 'print /d:"' + printer + '" "' + spath + '"';
 
-							case 'pdf':
+						break;
 
-								//for adobe
-								//var printIt = '"' + exe + '" /T "' + path + '" "' + printer + '"';
-								var printIt = '"' + printerPath + '" -print-to-default "' + path + '"';
+					case 'jpg':
 
-								break;
+						//var printIt = '"' + exe + '" /N /T "' + spath + '" "' + printer + '"';
+						//var printIt = 'print /d:"' + printer + '" "' + spath + '"';
 
-							case 'txt':
+						break;
 
-								//var printIt = '"' + exe + '" /N /T "' + path + '" "' + printer + '"';
-								var printIt = 'print /d:"' + printer + '" "' + path + '"';
+					default:
 
-								break;
+						break;
 
-							case 'doc':
-
-
-								//var printIt = '"' + exe + '" /q /n "' + path + '" "' + printer + '" /mFileExit';
-								var printIt = 'print /d:"' + printer + '" "' + path + '"';
-
-								break;
-
-							case 'xls':
-
-								//var printIt = '"' + exe + '" /q /n "' + path + '" "' + printer + '" /mFileExit';
-								var printIt = 'print /d:"' + printer + '" "' + path + '"';
-
-								break;
-
-							case 'jpg':
-
-								//var printIt = '"' + exe + '" /N /T "' + path + '" "' + printer + '"';
-								//var printIt = 'print /d:"' + printer + '" "' + path + '"';
-
-								break;
-
-							default:
-
-								break;
-
-						};
+				};
 						
-						var child = exec( printIt, function ( error, stdout, stderr ) {
+				var child = exec( printIt, function ( error, stdout, stderr ) {
 
-							if ( error !== null ) {
+					if ( error !== null ) {
 
-								callback(error);
-
-							} else {
-
-								callback( false, stdout );
-
-							}
-
-						});/**/
+						callback(error);
 
 					} else {
 
-						callback('Printer Path could not be initialised.  Please contact the Adminstrator.');
+						callback( false, stdout );
 
 					}
 
 				});
-				
 
 			};
 
@@ -346,219 +335,102 @@
 		var child,
 			spawn = require("child_process").spawn;
 
-		cmdOSArchitecture( function(error, arch) {
+		var err 	= [],
+			result 	= [];
 
-			if( error === false ) {
+		child = exec( "powershell.exe -noprofile -executionpolicy bypass " + path.join( __dirname, 'credMan.ps1') + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
 
-				if( arch == "64-bit" ) {
-					
-					// %PROGRAMFILES(x86)
-					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files` `(x86`)\\HSE` Sprint` 33\\node-core\\credMan.ps1" + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
-					
-				} else if( arch == "32-bit" ) {
-
-					//child = spawn( "powershell.exe", ["c:\\program files\\HSE Sprint 33\\node-core\\credMan.ps1 -AddCred", "pholacoalhse\\admin", "M1inopex" ] );
-					//child = exec( "powershell.exe c:\\program` files\\HSE` Sprint` 33\\node-core\\credMan.ps1 -AddCred -Target " + domain + " -User " + username + " -Pass " + password );
-					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files\\HSE` Sprint` 33\\node-core\\credMan.ps1 -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
-
-				};
-
-				var err = [],
-					result = [];
-
-				child.stdout.on( "data", function(data) {
+		child.stdout.on( "data", function(data) {
 				
-					//console.log( "Powershell Data: " + data);
+			//console.log( "Powershell Data: " + data);
 
-					result.push(data);
+			result.push(data);
 				
-				});
+		});
 				
-				child.stderr.on( "data", function(data) {
+		child.stderr.on( "data", function(data) {
 				
-					//console.log( "Powershell Errors: " + data );
+			//console.log( "Powershell Errors: " + data );
 
-					err.push(data);
+			err.push(data);
 				
-				});
+		});
 				
-				child.on( "exit", function(){
+		child.on( "exit", function(){
 
-					//console.log("Powershell Script finished");
+			//console.log("Powershell Script finished");
 
-					if( err.length > 0 ) {
+			if( err.length > 0 ) {
 
-						callback(err);
-
-					} else {
-
-						callback(false, result);
-
-					};
-				
-				});
-
-				child.stdin.end(); //end input
+				callback(err);
 
 			} else {
 
-				callback(error);
+				callback(false, result);
 
 			};
-
+				
 		});
 
-	}
-
-	function cmdDomainLogout( path, username, callback ) {
-
-		
+		child.stdin.end(); //end input
 
 	}
 
-	function cmdSavePDF( path, fileName, dd, callback ) {
+	function cmdDomainLogout( path, username, callback ) {}
+
+	function cmdSavePDF( spath, fileName, dd, callback ) {
+
+		var fonts = {
+				Roboto: {
+					"normal": 	 	path.join( __dirname, 'thirdparty/fonts/Roboto-Regular.ttf'),
+					"bold": 		path.join( __dirname, 'thirdparty/fonts/Roboto-Medium.ttf'),	//'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Medium.ttf',
+					"italics": 	 	path.join( __dirname, 'thirdparty/fonts/Roboto-Italic.ttf'),	//'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf',
+					"bolditalics": 	path.join( __dirname, 'thirdparty/fonts/Roboto-Italic.ttf')	//'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf'
+				}
 		
-		cmdOSArchitecture( function(error, arch) {
+		};
 
-			if( error === false ) {
+		var printer = new PdfPrinter( fonts );
+		var pdfDoc = printer.createPdfKitDocument(dd);
 
-				/**/
-				if( arch == "64-bit" ) {
+		//var now = new Date();
 
-					var fonts = {
-							Roboto: {
-								"normal": 	 	'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Regular.ttf',
-								"bold": 		'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Medium.ttf',
-								"italics": 	 	'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf',
-								"bolditalics": 	'c:\\program files (x86)\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf'
-							}
-					};
+		if ( !fs.existsSync(spath) ){
 
-				} else if( arch == "32-bit" ) {
+			//EMAILING OPTION
 
-					var fonts = {
-							Roboto: {
-								"normal": 	 	'c:\\program files\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Regular.ttf',
-								"bold": 		'c:\\program files\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Medium.ttf',
-								"italics": 	 	'c:\\program files\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf',
-								"bolditalics": 	'c:\\program files\\HSE Sprint 33\\node-core\\thirdparty\\fonts\\Roboto-Italic.ttf'
-							}
-					};
+			//fs.mkdirSync(spath);
 
-				} else {
-
-					var fonts = {
-							Roboto: {
-								"normal": 	  	appDir +'fonts/Roboto-Regular.ttf',
-								"bold": 	 	appDir +'fonts/Roboto-Medium.ttf',
-								"italics": 	  	appDir +'fonts/Roboto-Italic.ttf',
-								"bolditalics":  appDir +'fonts/Roboto-Italic.ttf'
-							}
-					};
-					/** /
-							fonts.Roboto = {
-									"normal": './node-core/thirdparty/fonts/Roboto-Regular.ttf',
-									"bold": './node-core/thirdparty/fonts/Roboto-Medium.ttf',
-									"italics": './node-core/thirdparty/fonts/Roboto-Italic.ttf',
-									"bolditalics": './node-core/thirdparty/fonts/Roboto-Italic.ttf'
-					};/**/
-
-				};
-				
-				var printer = new PdfPrinter( fonts );
-				var pdfDoc = printer.createPdfKitDocument(dd);
-
-				//var now = new Date();
-
-				if ( !fs.existsSync(path) ){
-
-					//EMAILING OPTION
-
-					//fs.mkdirSync(path);
-
-					mkdirp( path, function (err) {
+			mkdirp( spath, function (err) {
 						
-						if (err) {
+				if (err) {
 
-							callback(err);
-
-						} else {
-
-							pdfDoc.pipe( fs.createWriteStream( path + fileName ) );
-
-							pdfDoc.end();
-
-							callback( false, path + fileName );
-
-						}
-
-					});
+					callback(err);
 
 				} else {
 
-					pdfDoc.pipe( fs.createWriteStream( path + fileName ) );
+					pdfDoc.pipe( fs.createWriteStream( spath + fileName ) );
 
 					pdfDoc.end();
 
-					callback( false, path + fileName );
-				
+					callback( false, spath + fileName );
+
 				}
 
-			}
+			});
 
-		});
-	
-	}
-	
-	/**
-     * @private
-     * Kill Adobe Acrobat Process
-     *
-     * @param { String.name } [varname] [description] Acrord32.exe | Acrobat.exe
-     * 
-     */
-	function cmdKillAdobe( adobeRdr, callback ) {
+		} else {
 
-		var command = 'TaskKill /F /IM ' + adobeRdr;
+			pdfDoc.pipe( fs.createWriteStream( spath + fileName ) );
 
-		exec( command, function ( error, stdout, stderr ) {
+			pdfDoc.end();
 
-			if( error ) {
-
-		 		callback(error);
-		 	}
-
-		 	callback(false, 'Adobe Reader Closed');
-
-		 	//return "success";
-
-		});
-
-		/** /
-
-		_getProcessID ( 'Acrobat.exe', function( err, pid ) {
-
-			if( err ) {
-
-				return err;
-			}
-
-			var command = 'TaskKill /F /IM Acrobat.exe';
-
-			 exec( command, function ( error, stdout, stderr ) {
-
-			 	if( error ) {
-
-			 		return error;
-			 	}
-
-			 });
-
-		} );
-		/**/
+			callback( false, spath + fileName );
+				
+		}
 
 	}
-
+	
 	/**
 	 * @private
 	 * 
@@ -571,90 +443,45 @@
 	function cmdEmail( data, callback ) {
 
 		var child;
+		var mailerPath = path.join( __dirname, '../', 'www/thirdparty/apps/SwithMail.exe');
 
-		cmdOSArchitecture( function(error, arch) {
+		var mailMe  = '"' + mailerPath + '" /s /drnl false /name "' + data.FromName + '" /from "' + data.FromAddress + '" /pass "' + data.password + '" /obscurepassword "' + data.obscurepassword + '" /server "' + data.mailserver + '" /p "' + data.mailserverport + '" /ssl "' + data.ssl + '" /rr "' + data.requestreceipt + '" /to "' + data.toaddress + '" /cc "' + data.cc + '" /rt "' + data.replyto + '" /sub "' + data.subject + '" /body "' + data.body + '" /html "' + data.html + '" /a "' + data.attachment + '" /readreceipt "' + data.readreceipt + '"';
 
-			if( error === false ) {
+		var err 	= [],
+			result 	= [];
 
-				if( arch == "64-bit" ) {
+		/**/
+		child = exec( mailMe );
 
-					var mailerPath = "%PROGRAMFILES(x86)%/HSESPR~1/www/thirdparty/apps/SwithMail.exe";
+		child.stdout.on( "data", function(data) {
 
-					//child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files` `(x86`)\\HSE` Sprint` 33\\node-core\\credMan.ps1" + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
-					
-				} else if( arch == "32-bit" ) {
-
-					var mailerPath = "%PROGRAMFILES%/HSESPR~1/www/thirdparty/apps/SwithMail.exe";
-					//child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files\\HSE` Sprint` 33\\node-core\\credMan.ps1 -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
-
-				} else {
-
-					callback( 'Email sent not sent.  Unknown OS Archicture: ' + arch );
-
-					return;
-
-				};
-
-				var mailMe  = '"' + mailerPath + '" /s /drnl false /name "' + data.FromName + '" /from "' + data.FromAddress + '" /pass "' + data.password + '" /obscurepassword "' + data.obscurepassword + '" /server "' + data.mailserver + '" /p "' + data.mailserverport + '" /ssl "' + data.ssl + '" /rr "' + data.requestreceipt + '" /to "' + data.toaddress + '" /cc "' + data.cc + '" /rt "' + data.replyto + '" /sub "' + data.subject + '" /body "' + data.body + '" /html "' + data.html + '" /a "' + data.attachment + '" /readreceipt "' + data.readreceipt + '"';
-
-				var err = [],
-					result = [];
-
-				/**/
-				child = exec( mailMe );
-
-				child.stdout.on( "data", function(data) {
-
-					result.push(data);
+			result.push(data);
 				
-				});
+		});
 				
-				child.stderr.on( "data", function(data) {
+		child.stderr.on( "data", function(data) {
 
-					err.push(data);
+			err.push(data);
 				
-				});
+		});
 				
-				child.on( "exit", function(){
+		child.on( "exit", function(){
 
-					//console.log("Powershell Script finished");
+			//console.log("Powershell Script finished");
 
-					if( err.length > 0 ) {
+			if( err.length > 0 ) {
 
-						callback(err);
-
-					} else {
-
-						callback(false, result);
-
-					};
-				
-				});
-
-				child.stdin.end(); //end input
-
-				/** /
-				child = exec( mailMe, function ( error, stdout, stderr ) {
-
-					if ( error !== null ) {
-
-						callback(error);
-
-					} else {
-
-						callback( false, stdout );
-
-					}
-
-				});/**/
+				callback(err);
 
 			} else {
 
-				callback( 'Email sent not sent.  OS Archicture Error: ' + error );
+				callback(false, result);
 
 			};
-
+				
 		});
+
+		child.stdin.end(); //end input
 
 	}
 
@@ -741,81 +568,185 @@
 	 * 
 	 * Return Mac Address of the current machine
 	 */
-	function cmdCheckForUpdates( callback ) {
+	function cmdCheckForUpdates( updateUrl, currentVersion, callback ) {
 
-		//console.log( "[HSE-Node] checking for updates");
+		//console.log( "[HSE-Node] checking for updates");		
 
-		/** /
-		var autoupdater = require('./thirdparty/auto-updater/auto-updater.js')({
-				pathToJson: '',
-				async: true,
-				silent: false,
-				autoupdate: false,
-				check_git: true
-		});
-		/** /
-		autoupdater = {
-			pathToJson: '',
-			async: true,
-			silent: false,
-			autoupdate: false,
-			check_git: true
-		};/** /
+		request({
+				encoding 	: null,
+				url 		: updateUrl
+			})
+			.pipe( fs.createWriteStream( path.join( __dirname, '../', 'hse-update.zip') ) )
+			.on('error', function(err) {
 
-		// State the events 
-		autoupdater.on( 'git-clone', function() {
-			console.log("You have a clone of the repository. Use 'git pull' to be up-to-date");
-		});
+				callback(err)
 
-		autoupdater.on( 'check-up-to-date', function(v) {
-			console.log("You have the latest version: " + v);
-		});
+			})
+			.on( 'close', function () {
 
-		autoupdater.on( 'check-out-dated', function(v_old , v) {
-			console.log("Your version is outdated. "+v_old+ " of "+v);
-			//autoupdater.forceDownloadUpdate(); // If autoupdate: false, you'll have to do this manually. 
-			// Maybe ask if the'd like to download the update. 
-		});
+			   callback( false, 'Update Downloaded for ' + currentVersion);
+			
+			});
 
-		autoupdater.on( 'update-downloaded', function() {
-			console.log("Update downloaded and ready for install");
-			//autoupdater.forceExtract(); // If autoupdate: false, you'll have to do this manually. 
+	}
+
+	/**
+	 * @private
+	 * 
+	 * @return 
+	 * 
+	 * Return
+	 */
+	function cmdNot5yStart( callback ) {
+
+		svc.on( 'start',function(){
+
+			//Q5log.info('Q-Not5y Started.');
+
+			callback( false, 'Not5y Started.');
+			
 		});
 
-		autoupdater.on( 'update-not-installed', function() {
-			console.log("The Update was already in your folder! It's read for install");
-			//autoupdater.forceExtract(); // If autoupdate: false, you'll have to do this manually. 
+		svc.on( 'install',function(){
+
+			//Q5log.info('Q-Not5y Installed.');
+
+			svc.start();
+			
 		});
 
-		autoupdater.on( 'extracted', function() {
-			console.log("Update extracted successfully!");
-			console.log("RESTART THE APP!");
+		svc.on( 'invalidinstallation',function(){
+
+			callback('Not5y could not be installed.');
+			
 		});
 
-		autoupdater.on( 'download-start', function(name) {
-			console.log("Starting downloading: " + name);
+		svc.on( 'uninstall',function(){
+
+			callback( false, 'Not5y Service Removed successfully.');
+		
 		});
 
-		autoupdater.on( 'download-update', function(name,perc) {
-			//process.stdout.write("Downloading " + perc + "% \033[0G");
+		svc.on( 'error',function(){
+
+			callback( 'Not5y Error.');
+		
 		});
 
-		autoupdater.on( 'download-end', function(name) {
-			console.log("Downloaded " + name);
-		});
-
-		autoupdater.on( 'download-error', function(err) {
-			console.log("Error when downloading: " + err);
-		});
-
-		autoupdater.on( 'end', function() {
-			console.log("The app is ready to function");
-		});
-
-		// Start checking 
-		autoupdater.forceCheck();
+		//svc.install();
 		/**/
+		if( svc.exists ) {
+
+			svc.start();
+			//svc.uninstall();
+		
+		} else {
+
+			svc.install();
+
+			//callback('Not5y Service Not Installed');
+		
+		}/**/
 	
+	}
+
+	/**
+	 * @private
+	 * 
+	 * @return 
+	 * 
+	 * Return
+	 */
+	function cmdNot5yStop( callback ) {
+
+		svc.on( 'stop ',function(){
+
+			svc.uninstall();
+			
+		});
+
+		svc.on( 'uninstall',function(){
+
+			callback( false, 'Not5y Service Stopped & Removed successfully.');
+		
+		});
+
+		svc.on( 'error',function(){
+
+			callback( 'Not5y Error.');
+		
+		});
+
+		if( svc.exists ) {
+
+			svc.stop();			
+		
+		} else {
+
+			callback('Not5y Service Not Installed');
+		
+		}
+	
+	}
+
+	/**
+	 * @private
+	 * 
+	 * @return 
+	 * 
+	 * Return
+	 */
+	function cmdNot5yInstall( callback ) {
+
+		svc.on( 'install',function(){
+
+			svc.start();
+			
+		});
+
+		svc.on( 'start',function(){
+
+			callback( false, 'Not5y Installed & Started.');
+			
+		});
+
+		if( svc.exists ) {
+
+			svc.start();
+		
+		} else {
+
+			svc.install();
+		
+		}
+
+	}
+
+	/**
+	 * @private
+	 * 
+	 * @return 
+	 * 
+	 * Return
+	 */
+	function cmdNot5yUninstall( callback ) {
+
+		svc.on( 'uninstall',function(){
+
+			callback( false, 'Not5y Service Removed successfully.');
+		
+		});
+
+		if( svc.exists ) {
+
+			svc.uninstall();
+		
+		} else {
+
+			callback('Not5y Service Not Installed');
+		
+		}
+
 	}
 
 	/**
@@ -908,51 +839,6 @@
 	}
 
 	/**
-	 * @public
-	 * 
-	 * @return
-	 * 
-	 * Return 
-	 */
-	function cmdSaveXlsx( path, data, callback ) {
-
-		/** /
-		jsonfile.writeFile( path, data, function (err) {
-			
-			callback( err, {
-				'path': path
-			});
-
-		});
-		/**/
-	
-	}
-
-	/**
-	 * @public
-	 * 
-	 * @return
-	 * 
-	 * Return 
-	 */
-	function cmdGetXlsx( path, callback ) {
-
-		var workbook = xlsx.readFile( path );
-
-		callback( false, {
-			'path': workbook
-		});
-
-		/** /
-		jsonfile.readFile( path, function(err, obj) {
-
-			callback(err, obj);
-
-		});/**/
-
-	}
-
-	/**
      * @private CRUD
      * @param {ws .<WebSocket>}
      * @param {credentials .<object>}
@@ -960,21 +846,6 @@
      * QUERY DB
      */
 	function cmdQuery( ws, Qtype, db, callback  ) {
-
-		//callback( false, Qtype );
-
-		// ping test
-		//_mysqlServer.ping( function (err) {
-			
-		//	if (err) {
-
-				// reconnect & try again
-			
-		//		callback(err);
-			
-		//	} else {
-
-		//_mysqlServer.connect();
 		
 		switch( Qtype ) {
 
@@ -1029,45 +900,8 @@
 					break;
 
 		};
-
-		//_mysqlServer.end();
-
-		//	}
-		//});
 	
 	}
-
-	/** /
-	function mkdirSync ( path, callback ) {
-
-		try {
-		
-			fs.mkdirSync(path);
-
-			callback(false);
-		
-		} catch(e) {
-
-			if ( e.code != 'EEXIST' ) {
-
-				callback(e);
-
-			};
-
-		}
-	
-	}
-
-	function mkdirpSync (dirpath) {
-	
-		var parts = dirpath.split(path.sep);
-		
-		for( var i = 1; i <= parts.length; i++ ) {
-			mkdirSync( path.join.apply(null, parts.slice(0, i)) );
-		}
-
-	}
-	/**/
 
     /**
      *
@@ -1083,6 +917,71 @@
         /*
 		 *	:: COMMANDS
 		 * ----------------------------------------------------*/
+		
+		// Not5y
+		_domainManager.registerCommand(
+			"base",						// domain name
+			"not5yStart",				// command name
+			cmdNot5yStart,				// command handler function
+			true,						// this command is synchronous
+			"Start Not5y",
+			[],
+			[
+				{
+					name: "result",
+					type: "function",
+					description: "Initiate Not5y Application Service"
+				}
+			]
+		);
+		_domainManager.registerCommand(
+			"base",						// domain name
+			"not5yStop",				// command name
+			cmdNot5yStop,				// command handler function
+			true,						// this command is synchronous
+			"Stop Not5y",
+			[],
+			[
+				{
+					name: "result",
+					type: "function",
+					description: "Stop Not5y Application Service"
+				}
+			]
+		);
+		_domainManager.registerCommand(
+			"base",						// domain name
+			"not5yInstall",				// command name
+			cmdNot5yInstall,				// command handler function
+			true,						// this command is synchronous
+			"Stop Not5y",
+			[],
+			[
+				{
+					name: "result",
+					type: "function",
+					description: "Install Not5y Application Service"
+				}
+			]
+		);
+		_domainManager.registerCommand(
+			"base",						// domain name
+			"not5yUninstall",				// command name
+			cmdNot5yUninstall,				// command handler function
+			true,						// this command is synchronous
+			"Stop Not5y",
+			[],
+			[
+				{
+					name: "result",
+					type: "function",
+					description: "Install Not5y Application Service"
+				}
+			]
+		);
+
+		//
+
 		_domainManager.registerCommand(
 			"base",			// domain name
 			"getMemory",	// command name
@@ -1207,26 +1106,6 @@
 			]
 		);
 		_domainManager.registerCommand(
-			"base",       	// domain name
-			"killAdobe",    // command name
-			cmdKillAdobe,   // command handler function
-			true,          // this command is synchronous
-			"Handler for killing Adobe Acrobat Process",
-			[
-				{
-					name: "adobeRdr",
-					type: "String"
-				}
-			],
-			[
-            	{
-            		name: "callback",
-                	type: "function",
-                	description: "stdout"
-                }
-			]
-		);
-		_domainManager.registerCommand(
 			"base", 									// domain name
 			"sendEmail",								// command name
 			cmdEmail,									// command handler function
@@ -1281,29 +1160,19 @@
 			"base", 										// domain name
 			"CheckForUpdates",								// command name
 			cmdCheckForUpdates,								// command handler function
-			false,											// this command is synchronous
-			"Returns Mac Address of the current machine",
-			[],             								// no parameters
-			[]												// no return @params
-		);
-		_domainManager.registerCommand(
-			"base", 										// domain name
-			"GetXlsx",										// command name
-			cmdGetXlsx,										// command handler function
-			true,											// this command is asynchronous
-			"Get Xlsx Data from file",
+			true,											// this command is synchronous
+			"Returns updates",
 			[
 				{
-					name: "path", 
+					name: "updateUrl", 
+					type: "string"
+				},
+				{
+					name: "currentVersion", 
 					type: "string"
 				}
-			],												// parameters
-			[
-				{
-					name: "callback",
-					type: "function"
-				}
-			]												//
+			],             								// no parameters
+			[]												// no return @params
 		);
 		_domainManager.registerCommand(
 			"base", 									// domain name

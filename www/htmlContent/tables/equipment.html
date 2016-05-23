@@ -1,23 +1,26 @@
-					<div class="row">
-						<div class="columns twelve" >
-							<h3 class="FiraFont uppercase mask-money"><strong>Equipment</strong>&nbsp;<span class="badge badge-success">{{hse_equipment.length}}</span></h3>
-							<br />							
-
-						</div>
-						<div class="columns three"></div>
-					</div>
-
+					
 					<div class="row">
 						<div class="columns sixteen">
 
-							<div data-ui-form-equipment-new></div>
+							<ang-accordion id="equipment-form-accordion" one-at-a-time="true" icon-position="left" close-icon-class="icon-chevron-right" open-icon-class="icon-chevron-down">
+
+								<!-- ALREADY EXPIRED -->
+								<collapsible-item class="alert-info" title="Add New Equipment" initially-open="false">
+
+									<div data-ui-form-equipment-new></div>
+
+								</collapsible-item>
+
+							</ang-accordion>
+
+							<br />
 
 							<hr />
 
 						</div>
 					</div>
 
-					<br /><br />
+					<br />
 
 					<div class="row">
 						<!--
@@ -55,7 +58,6 @@
 								</ul>
 							</div>
 						</div>
-						<div class="columns four"></div>
 						<div class="columns four">
 							<div class="columns sixteen" data-ng-if="search_results == true">
 								<button type="button" class="btn btn-large btn-info macdaddy-rounded uppercase mask-money" data-ng-click="resetSearch()" style="padding: 1em;">Clear Search</button>
@@ -80,16 +82,15 @@
 
 							</div>
 						</div>
+						<div class="columns four"></div>
 						<div class="columns four tr">
 							<div class="btn-group fr">
-								<!--
 								<button type="button" data-ng-click="export( 'equipment', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
 									<span class="icon-file-pdf alert-error"></span>
 								</button>
 								<button type="button" data-ng-click="export( 'equipment', 'csv' )" class="btn btn-large" data-title="Export Excel">
 									<span class="icon-file-excel alert-success"></span>
 								</button>
-								-->
 								<button 
 									type="button" 
 									data-ng-click="refreshData()"
@@ -110,19 +111,18 @@
 					<!-- -->
 					<table id="equipment-table" class="table footable hoverable" data-ng-if="hse_equipment.length > 0">
 						<thead>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
-								<th colspan="2"></th>
-								
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;">
+								<th colspan="3"></th>
 								<th class="tc" colspan="6">Equipment Details</th>
 								<th colspan="1" style="border:1px solid #ddd;">Action</th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;">
 								<th colspan="1" class="tc" style="border-top:1px solid #ddd;">
 									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
 										<span class="icon-checkmark3 alert-success"></span>
 									</button>
 								</th>
-								<th colspan="1" style="border-top:1px solid #ddd;">
+								<th colspan="2" style="border-top:1px solid #ddd;">
 									<h3 class="FiraFont uppercase mask-money"><strong>Total Equipment</strong>&nbsp;<span class="badge badge-success">{{hse_equipment.length}}</span></h3>
 								</th>
 								<th class="tc" style="border-top:1px solid #ddd;" colspan="2">PTO Date</th>
@@ -130,9 +130,14 @@
 								<th class="tc" style="border-top:1px solid #ddd;" colspan="2">Appointment Date</th>
 								<th colspan="1" style="border:1px solid #ddd;"></th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top:1px solid #ddd;">
 								<th colspan="1" style="border-top:1px solid #ddd;"></th>
-								<th class="sortable" data-sid="Name" style="border-top:1px solid #ddd;" data-ng-click="setSortExpression('Name')">Equipment Name</th>
+								<th class="sortable" data-sid="Name" style="border-top:1px solid #ddd;" data-ng-click="setSortExpression('Name')">
+									Equipment Name
+								</th>
+								<th class="sortable" data-sid="totalEmployees" style="border-top:1px solid #ddd;" data-ng-click="setSortExpression('totalEmployees')">
+									Total Employees
+								</th>
 								<th class="tc sortable alert-warning" colspan="1" style="border-top:1px solid #ddd;" data-sid="PTODateredDate" data-ng-click="setSortExpression('PTODateredDate')">O.D.</th>
 								<th class="tc sortable alert-danger" colspan="1" style="border-top:1px solid #ddd;" data-sid="PTODateorangeDate" data-ng-click="setSortExpression( 'PTODateorangeDate')">R.D.</th>
 								<th class="tc sortable alert-warning" colspan="1" style="border-top:1px solid #ddd;" data-sid="CertificateDateredDate" data-ng-click="setSortExpression( 'CertificateDateredDate')">O.D.</th>
@@ -143,26 +148,26 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in hse_equipment | paginate:50">
+							<!--<tr class="tl" bindonce data-ng-repeat="data in hse_equipment | paginate:50">-->
+							<tr class="tl" bindonce dir-paginate="data in hse_equipment | itemsPerPage: 50 track by data.ID" pagination-id="equipment-table">
 								
 								<td colspan="1" class="tc">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
 								</td>
-								<td colspan="1" bo-text="data.Name"></td>
+								<td colspan="1" class="mask-money" bo-text="data.Name"></td>
+								<td colspan="1" class="mask-money">
+									<button type="button" class="btn btn-link" bo-text="data.totalEmployees" data-ng-disabled="data.totalEmployees <= 0" data-ng-click="openDialog('equipment-employees', data.ID)"></button>
+								</td>
 
-								<td class="tc" colspan="1" bo-text="data.PTODateorangeDate | date: 'yyyy-MMM-dd'"></td>
-								<td class="tc" colspan="1" bo-text="data.PTODateredDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.PTODateorangeDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.PTODateredDate | date: 'yyyy-MMM-dd'"></td>
 
-								<td class="tc" colspan="1" bo-text="data.CertificateDateorangeDate | date: 'yyyy-MMM-dd'"></td>
-								<td class="tc" colspan="1" bo-text="data.CertificateDateredDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.CertificateDateorangeDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.CertificateDateredDate | date: 'yyyy-MMM-dd'"></td>
 
-								<td class="tc" colspan="1" bo-text="data.AppointmentDateorangeDate | date: 'yyyy-MMM-dd'"></td>
-								<td class="tc" colspan="1" bo-text="data.AppointmentDateredDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.AppointmentDateorangeDate | date: 'yyyy-MMM-dd'"></td>
+								<td class="tc mask-money" colspan="1" bo-text="data.AppointmentDateredDate | date: 'yyyy-MMM-dd'"></td>
 								
-								<!-- SOOPHA SHIYAT - ->
-								<td data-ng-repeat="(key,value) in data.data">{{value.orangeDate | date: 'yyyy-MM-dd' }} <small>({{value.dateName}})</small></td>
-								<td data-ng-repeat="(key,value) in data.data">{{value.redDate | date: 'yyyy-MM-dd'}} <small>({{value.dateName}})</small></td>
-								<!- - -->
 								<td class="mask-money" colspan="1" style="width:50px;">
 									<button 
 										type="button" 
@@ -171,25 +176,13 @@
 											Actions
 									</button>
 								</td>
-								
 		
 							</tr>
-							<!--
-							<tr class="tl" bindonce data-ng-repeat="data in hse_equipment | paginate:50">
-
-								<th colspan="2"></th>
-
-								<td data-ng-repeat="(key,value) in data.data">{{value.dateLength | number: 2 }}</td>
-								<td data-ng-repeat="(key,value) in data.data">{{value.dateLength | number: 2 }}</td>
-
-								<th colspan="1"></th>
-
-							</tr> -->
 
 						</tbody>
 						<tfoot class="footable-pagination tc">
 							<tr>
-								<td class="tc"colspan="2">
+								<td class="tc"colspan="3">
 									<!--
 									<select 
 										id="batchActions-equipment" 
@@ -202,7 +195,9 @@
 									</select>
 									-->
 								</td>
-								<td colspan="7"><paginator></paginator></td>
+								<td colspan="7">
+									<dir-pagination-controls pagination-id="equipment-table"></dir-pagination-controls>
+								</td>
 							</tr>
 						</tfoot>
 					
@@ -210,6 +205,9 @@
 
 					<script type="text/ng-template" id="equipmentActions">
 						<div data-ui-modal-equipment-actions></div>
+					</script>
+					<script type="text/ng-template" id="equipmentEmployees">
+						<div data-ui-modal-equipment-employees></div>
 					</script>
 					<script type="text/ng-template" id="equipmentStop">
 						<div data-ui-modal-equipment-department></div>

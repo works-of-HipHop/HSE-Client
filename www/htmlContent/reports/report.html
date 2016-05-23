@@ -17,7 +17,7 @@
 								<div class="input-append" style="width:90%;font-size:1em;" data-ng-hide="searchResults == true">
 									<input 
 										type="search"
-										placeholder="Please enter your ID Number..."
+										placeholder="Please enter an I.D. / Passport Number..."
 										class="mp-search search-query FiraFont tc"
 										data-ng-model="searchStr"
 										data-ui-touch-input />
@@ -60,7 +60,7 @@
 					
 					<table id="employees-table" class="table footable hoverable" style="margin-bottom:0;" data-ng-if="active_employee.length > 0">
 						<thead>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-top: 1px solid #ddd;border-right: 1px solid #ddd;">
 								<th style="width:50px;">
 									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
 										<span class="icon-checkmark3 alert-success"></span>
@@ -68,7 +68,7 @@
 								</th>
 								<th class="tc" colspan="6">Employee Details</th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-right: 1px solid #ddd;">
 								<th colspan="1"></th>
 								<th style="border-top:1px solid #ddd;" data-sid="firstName" data-ng-click="setSortExpression('firstName')" colspan="1">First Name</th>
 								<th style="border-top:1px solid #ddd;" data-sid="lastName" data-ng-click="setSortExpression('lastName')" colspan="1">Last Name</th>
@@ -80,9 +80,9 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in active_employee | paginate:50 track by data.ID">
+							<tr class="tl" bindonce data-ng-repeat="data in active_employee track by data.ID">
 								
-								<td class="mask-money tl" style="width:50px;">
+								<td class="mask-money tc" style="width:50px;">
 									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
 								</td>
 								<td class="mask-money uppercase">
@@ -105,10 +105,10 @@
 					<table id="employee-equipment-link" class="table footable hoverable" data-ng-if="active_employee.length > 0">
 																				
 						<thead>
-							<tr class="tl uppercase mask-money" style="border-bottom:1px solid #ddd;">
+							<tr class="tl uppercase mask-money" style="border-bottom:1px solid #ddd;border-right: 1px solid #ddd;">
 								<th colspan="4" class="mask-money tc uppercase">Training & Licensing Details</th>
 							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
+							<tr class="tl uppercase mask-money" style="cursor:pointer;border-right: 1px solid #ddd;">
 								<th data-sid="Name" data-ng-click="setSortExpression('Name')">Equipment Name</th>
 								<th class="tc" data-sid="PTODate">PTO Date</th>
 								<th class="tc" data-sid="certificateDate">Certificate Date</th>
@@ -144,7 +144,7 @@
 						</tbody>
 						<tfoot class="footable-pagination tc">
 							<tr>
-								<td colspan="4"><paginator></paginator></td>
+								<td colspan="4"></td>
 							</tr>
 						</tfoot>
 					</table>

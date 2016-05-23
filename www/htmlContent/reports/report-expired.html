@@ -2,12 +2,64 @@
 	<div class="row">
 
 		<div class="columns sixteen">
+			
 			<br />
+			<div class="row table-filter-swithes">
+
+				<div class="columns four tl">
+
+					<label class="FiraFont" for="PTODate">Show PTO's Only?</label>
+					<label class="switch tc">
+						<input type="checkbox" id="PTODate" data-ng-checked="filterDatePto" data-ng-click="filterByDate('pto')">
+						<i title="Show PTO's Only?"></i>
+					</label>
+
+				</div>
+				<div class="columns four tl">
+
+					<label class="FiraFont" for="CertificateDate">Show Certificate Dates Only?</label>
+					<label class="switch tc">
+						<input type="checkbox" id="CertificateDate" data-ng-checked="filterDate_certificate" data-ng-click="filterByDate('certificate')">
+						<i title="Show Certificate Dates Only?"></i>
+					</label>
+
+				</div>
+				<div class="columns four tl">
+
+					<label class="FiraFont" for="AppointmentDate">Show Appointment Dates Only?</label>
+					<label class="switch tc">
+						<input type="checkbox" id="AppointmentDate" data-ng-checked="filterDate_appointment" data-ng-click="filterByDate('appointment')">
+						<i title="Show Appointment Dates Only?"></i>
+					</label>
+
+				</div>
+				<div class="columns four tl">
+					<div class="btn-group">
+						<!-- -->
+						<button type="button" data-ng-click="export( 'report-expired', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
+							<span class="icon-file-pdf alert-error"></span>
+						</button>
+						<button type="button" data-ng-click="export( 'report-expired', 'csv' )" class="btn btn-large" data-title="Export Excel">
+							<span class="icon-file-excel alert-success"></span>
+						</button>
+						<!-- -->
+						<button 
+							type="button" 
+							data-ng-click="refreshData()"
+							class="btn dataRefresher refresh-data-expired full-rounded fr" >
+								<span class="icon-loop alert-info" title="Refresh Data"></span>
+						</button>
+					</div>
+				</div>
+
+			</div>
+
+			<br /><br />
+
 			<!-- FILTERS -->
 			<div class="row">
 				<div class="columns four">
-					<h3 class="FiraFont uppercase mask-money"><strong>Total Employees</strong>&nbsp;<span class="badge badge-success">{{totalRedEmployees}}</span></h3>
-					<br /><br />
+					
 					<div class="columns sixteen" data-ng-if="search_results == true">
 						<button type="button" class="btn btn-large btn-info macdaddy-rounded uppercase mask-money" data-ng-click="resetSearch()" style="padding: 1em;">Clear Search</button>
 					</div>
@@ -31,63 +83,60 @@
 
 					</div>
 				</div>
-				<!-- -->
-				<div class="columns four">
-							<div id="filter-occupation" data-ui-filter-data data-ng-if="search_results == false">
-								<span class="anchor macdaddy-rounded">Show all Occupations</span>
-								<ul class="unstyled items">
-									<li bindonce data-ng-repeat="db in hse_data.occupation" class="mask-money tl uppercase">
-										<div class="row">
-											<div class="columns two">
-												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="occupation" />
-											</div>
-											<div class="columns fourteen">
-												<span bo-text="db.Name"></span>&nbsp;(<span bo-text="db.totalEmployees"></span>)
-											</div>
-										</div>
-									</li>
-								</ul>
-							</div>
-				</div>
-				<!-- -->
-				<div class="columns four">
-							<div id="filter-department" data-ui-filter-data data-ng-if="search_results == false">
-								<span class="anchor macdaddy-rounded">Show all Departments</span>
-								<ul class="unstyled items">
-									<li bindonce data-ng-repeat="db in hse_data.department" class="mask-money tl uppercase">
-										<div class="row">
-											<div class="columns two">
-												<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="department" />
-											</div>
-											<div class="columns fourteen">
-												<span bo-text="db.Name"></span>&nbsp;(<span bo-text="db.totalEmployees"></span>)
-											</div>
-										</div>
-									</li>
-								</ul>
-							</div>
-				</div>
-				<!-- -->
 				
-				<div class="columns four tr">
-					
-					<div class="btn-group fr">
-						<!-- -->
-						<button type="button" data-ng-click="export( 'report-expired', 'pdf' )" class="btn btn-large" data-title="Export to PDF">
-							<span class="icon-file-pdf alert-error"></span>
-						</button>
-						<button type="button" data-ng-click="export( 'report-expired', 'csv' )" class="btn btn-large" data-title="Export Excel">
-							<span class="icon-file-excel alert-success"></span>
-						</button>
-						<!-- -->
-						<button 
-							type="button" 
-							data-ng-click="refreshData()"
-							class="btn dataRefresher refresh-data-expired full-rounded fr" >
-								<span class="icon-loop alert-info" title="Refresh Data"></span>
-						</button>
+				<div class="columns four">
+					<div id="filter-department" data-ui-filter-data data-ng-if="search_results == false">
+						<span class="anchor macdaddy-rounded">Show all Departments</span>
+						<ul class="unstyled items">
+							<li bindonce data-ng-repeat="db in hse_data.department" class="mask-money tl uppercase">
+								<div class="row">
+									<div class="columns two">
+										<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="department" />
+									</div>
+									<div class="columns fourteen">
+										<span bo-text="db.Name"></span>
+									</div>
+								</div>
+							</li>
+						</ul>
 					</div>
-						
+				</div>
+				<!-- -->
+				<div class="columns four">
+					<div id="filter-occupation" data-ui-filter-data data-ng-if="search_results == false">
+						<span class="anchor macdaddy-rounded">Show all Occupations</span>
+						<ul class="unstyled items">
+							<li bindonce data-ng-repeat="db in hse_data.occupation" class="mask-money tl uppercase">
+								<div class="row">
+									<div class="columns two">
+										<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="occupation" />
+									</div>
+									<div class="columns fourteen">
+										<span bo-text="db.Name"></span>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- -->
+
+				<div class="columns four">
+					<div id="filter-equipment" data-ui-filter-data data-ng-if="search_results == false">
+						<span class="anchor macdaddy-rounded">Show all Equipment</span>
+						<ul class="unstyled items">
+							<li bindonce data-ng-repeat="db in hse_equipment" class="mask-money tl uppercase">
+								<div class="row">
+									<div class="columns two">
+										<input type="checkbox" class="filterInput" data-uid="{{db.ID}}" data-type="equipment" />
+									</div>
+									<div class="columns fourteen">
+										<span bo-text="db.Name"></span>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
 				</div>
 						
 			</div>
@@ -97,28 +146,43 @@
 			<div class="alert alert-block alert-info FiraFont tc" data-ng-if="redEmployees.length <= 0">
 				<p class="FiraFont">There are no Employees with expired dates at the moment.</p>
 			</div>
+			
 			<table id="report-expired" class="table footable hoverable" data-ng-if="redEmployees.length > 0">
 																				
 				<thead>
-					<tr class="tl uppercase mask-money" style="cursor:pointer;">
+					<tr class="tl uppercase mask-money" style="cursor:pointer;border-top: 1px solid #ddd;border-right: 1px solid #ddd;">
 						<th class="tc" style="width:50px;">
 						</th>
-						<th class="sortable" data-sid="employeeName" data-ng-click="setSortExpression('employeeName')">Employee Name</th>
-						<th class="sortable" data-sid="departmentName" data-ng-click="setSortExpression('departmentName')">Department Name</th>
-						<th class="sortable" data-sid="userOccupation" data-ng-click="setSortExpression('userOccupation')">Occupation</th>
-						<th data-sid="equipmentID">Equipment Name</th>
+						<th class="sortable" data-sid="employeeName" data-ng-click="setSortExpression('employeeName')">
+							Employee Name&nbsp;<span class="badge badge-success">{{totalRedEmployees}}</span>
+						</th>
+						<th class="sortable" data-sid="departmentName" data-ng-click="setSortExpression('departmentName')">
+							Department Name&nbsp;<span class="badge badge-success">{{totalDepartments}}</span>
+						</th>
+						<th class="sortable" data-sid="userOccupation" data-ng-click="setSortExpression('userOccupation')">
+							Occupation&nbsp;<span class="badge badge-success">{{totalOccupations}}</span>
+						</th>
+						<th data-sid="equipmentID">
+							Equipment Name&nbsp;<span class="badge badge-success">{{totalEquipment}}</span>
+						</th>
 						<th class="sortable tc" data-sid="PTODate" data-ng-click="setSortExpression('PTODate')">PTO Date</th>
 						<th class="sortable tc" data-sid="appointmentDate" data-ng-click="setSortExpression('appointmentDate')">Certificate Date</th>
 						<th class="sortable tc" data-sid="dateAdded" data-ng-click="setSortExpression('dateAdded')">Appointment Date</th>
 					</tr>
 				</thead>
 				<tbody >
-					<tr class="tl" bindonce data-ng-repeat="(key, value) in redEmployees track by $index">
+					<!--<tr class="tl" bindonce data-ng-repeat="(key, value) in redEmployees track by $index"> -->
+
+					<tr class="tl" bindonce dir-paginate="(key, value) in redEmployees | itemsPerPage: 15 track by $index" pagination-id="report-expired">
 					
 						<td class="mask-money tc" style="width:50px;">
 							<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{$index}}" />
 						</td>
-						<td class="tl mask-money">{{value.employeeName}}</td>
+						<td class="tl mask-money">
+							<button type="button" class="btn btn-link btn-block mask-money tl" data-ng-click="previewEmployee(value.employeeID)">
+								{{value.employeeName}}
+							</button>
+						</td>
 						<td class="tl mask-money">{{value.departmentName}}</td>
 						<td class="tl mask-money">{{value.userOccupation}}</td>
 						<td class="mask-money uppercase">
@@ -130,102 +194,34 @@
 									<option value="">Select Equipment&hellip;</option>
 							</select>
 						</td>
-						<td class="tc mask-money uppercase">{{value.PTODate | date: 'yyyy-MMM-dd'}}</td>
-						<td class="tc mask-money uppercase">{{value.certificateDate | date: 'yyyy-MMM-dd'}}</td>
-						<td class="tc mask-money uppercase">{{value.appointmentDate | date: 'yyyy-MMM-dd'}}</td>
+						<td class="tc mask-money uppercase" data-ng-class="{ 'alert-error': value.PTOExpired == true }">
+							{{value.PTODate | date: 'yyyy-MMM-dd'}}
+						</td>
+						<td class="tc mask-money uppercase" data-ng-class="{ 'alert-error': value.certificateDateExpired == true }">
+							{{value.certificateDate | date: 'yyyy-MMM-dd'}}
+						</td>
+						<td class="tc mask-money uppercase" data-ng-class="{ 'alert-error': value.appointmentDateExpired == true }">
+							{{value.appointmentDate | date: 'yyyy-MMM-dd'}}
+						</td>
 					</tr>
 				</tbody>
-				<!--
-				<tbody data-ng-repeat="redEmployee in redEmployees track by $index">
-					<tr class="tl" bindonce data-ng-repeat="(key, value) in redEmployee.meta track by $index">
-					
-						<td class="mask-money tc" style="width:50px;">
-							<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
-						</td>
-						<td class="tl mask-money" bo-text="value.employeeName"></td>
-						<td class="tl mask-money" bo-text="value.departmentName"></td>
-						<td class="tl mask-money" bo-text="value.userOccupation"></td>
-						<td class="mask-money uppercase">
-							<select 
-								required="required"
-								data-ng-model="value.equipmentID"
-								data-ng-disabled="true"
-								data-ng-options="a.ID as a.Name for a in hse_equipment">
-									<option value="">Select Equipment&hellip;</option>
-							</select>
-						</td>
-						<td class="tc mask-money uppercase" bo-text="value.PTODate | date: 'yyyy-MMM-dd'"></td>
-						<td class="tc mask-money uppercase" bo-text="value.certificateDate | date: 'yyyy-MMM-dd'"></td>
-						<td class="tc mask-money uppercase" bo-text="value.appointmentDate | date: 'yyyy-MMM-dd'"></td>
-					</tr>
-				</tbody> -->
-				<tfoot class="footable-pagination tc"></tfoot>
-			</table>
-			<!--
-			<table id="report-expired" class="table footable hoverable" data-ng-if="redEmployees.length > 0">
-				<thead>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
-								<th style="width:50px;">
-									<button type="button" class="btn alert-info" data-ng-click="selectAll(key)">
-										<span class="icon-checkmark3 alert-success"></span>
-									</button>
-								</th>
-								<th class="tc" colspan="6">Employee Details</th>
-								<th colspan="2" style="border:1px solid #ddd;">Action</th>
-							</tr>
-							<tr class="tl uppercase mask-money" style="cursor:pointer;">
-								<th colspan="1"></th>
-								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="firstName" data-ng-click="setSortExpression('firstName')" colspan="1">First Name</th>
-								<th class="sortable" style="border-top:1px solid #ddd;" data-sid="lastName" data-ng-click="setSortExpression('lastName')" colspan="1">Last Name</th>
-								<th class="sortable" data-sid="employeeNumber" data-ng-click="setSortExpression('employeeNumber')">Employee No.:</th>
-								<th class="sortable" data-sid="idNumber" data-ng-click="setSortExpression('idNumber')">ID Number</th>
-								<th class="sortable" data-sid="userOccupation" data-ng-click="setSortExpression('userOccupation')">Occupation</th>
-								<th class="sortable" data-sid="departmentName" data-ng-click="setSortExpression('departmentName')">Department</th>
-								<th class="sortable" data-sid="emailAddress" data-ng-click="setSortExpression('emailAddress')">Email</th>
-								<th colspan="2" style="border:1px solid #ddd;"></th>
-							</tr>
-				</thead>
-				<tbody>
-							<tr class="tl" bindonce data-ng-repeat="data in redEmployees | paginate:50 track by data.ID">
-								
-								<td class="mask-money tc" style="width:50px;">
-									<input type="checkbox" name="accountActions[]" class="adminActionInput" data-uid="{{data.ID}}" />
-								</td>
-								<td class="mask-money uppercase">
-									<span bo-text="data.firstName"></span>
-								</td>
-								<td class="mask-money uppercase" bo-text="data.lastName"></td>
-								<td class="mask-money uppercase" bo-text="data.employeeNumber"></td>
-								<td class="mask-money">
-									<span bo-text="data.idNumber"></span>
-								</td>
-								
-								<td class="mask-money" bo-text="data.userOccupation"></td>
-								<td class="mask-money" bo-text="data.departmentName"></td>
-								<td class="mask-money" bo-text="data.emailAddress"></td>
-								<td class="mask-money" colspan="2" style="width:50px;">
-									<button 
-										type="button" 
-										class="btn btn-info mask-money uppercase" 
-										data-ng-click="openDialog('employee-action', data.ID)" data-ng-disabled="fetchingData">
-											Actions
-									</button>
-								</td>
-		
-							</tr>
-				</tbody>
+
 				<tfoot class="footable-pagination tc">
 					<tr>
-						<td class="tc"colspan="1">
+						<td colspan="8">
+							<dir-pagination-controls pagination-id="report-expired"></dir-pagination-controls>
 						</td>
-						<td colspan="9"><paginator></paginator></td>
 					</tr>
 				</tfoot>
-					
+			
 			</table>
-			-->
+
 			<br />
 			
 		</div>
 
 	</div>
+
+	<script type="text/ng-template" id="employeePreview">
+		<div data-ui-modal-employee-preview></div>
+	</script>
