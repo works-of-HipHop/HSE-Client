@@ -42,7 +42,7 @@ var unzip		= require('unzip'),
 	EventLogger = require('node-windows').EventLogger;
 
 var Q5log 		= new EventLogger('Q-Not5y');
-var DBMine 		= require( path.join( __dirname, '../', 'node-core/QDb') );
+var DBMine 		= require( path.join( __dirname, '../', 'QDb') );
 
 // LogTime / Ping MySQL
 function logTime() {
