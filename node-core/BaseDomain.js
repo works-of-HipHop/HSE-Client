@@ -337,11 +337,11 @@
 
 				if( arch == "64-bit" ) {
 					
-					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files` `(x86`)\\HSE` Induction\\node-core\\credMan.ps1" + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
+					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files` `(x86`)\\HSE-Client\\node-core\\credMan.ps1" + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
 					
 				} else if( arch == "32-bit" ) {
 
-					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files\\HSE` Induction\\node-core\\credMan.ps1 -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
+					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files\\HSE-Client\\node-core\\credMan.ps1 -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
 
 				};
 
