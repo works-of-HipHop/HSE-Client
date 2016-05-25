@@ -86,10 +86,10 @@
 
 		_SQL_db_config 	= {
 			//socketPath 		: address.port,
-			host     			: DBconfigObj.production.host,
-			user     			: DBconfigObj.production.user,
-			password 			: DBconfigObj.production.password,
-			database 			: DBconfigObj.production.database,
+			host     			: DBconfigObj.development.host,
+			user     			: DBconfigObj.development.user,
+			password 			: DBconfigObj.development.password,
+			database 			: DBconfigObj.development.database,
 			debug 				: false,
 			multipleStatements 	: true,
 			insecureAuth 		: true
