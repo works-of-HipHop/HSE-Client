@@ -218,11 +218,7 @@
 
 	/**
 	 * @private
-	 * @param {type.<string>} filetype
-	 * @param {printer.<string>} printer name
-	 * @param {exe.<string>} path to program
-	 * @param {path.<string>} path to load
-	 * Print PDF FILE
+	 * GET OS ARCHITECTURE
 	 */
 	function cmdOSArchitecture( callback ) {
 
@@ -335,44 +331,64 @@
 		var child,
 			spawn = require("child_process").spawn;
 
-		var err 	= [],
-			result 	= [];
+		cmdOSArchitecture( function(error, arch) {
 
-		child = exec( "powershell.exe -noprofile -executionpolicy bypass " + path.join( __dirname, 'credMan.ps1') + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
+			if( error === false ) {
 
-		child.stdout.on( "data", function(data) {
+				if( arch == "64-bit" ) {
+					
+					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files` `(x86`)\\HSE` Induction\\node-core\\credMan.ps1" + " -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
+					
+				} else if( arch == "32-bit" ) {
+
+					child = exec( "powershell.exe -noprofile -executionpolicy bypass c:\\program` files\\HSE` Induction\\node-core\\credMan.ps1 -AddCred -Target '" + domain + "' -User '" + username + "' -Pass '" + password + "' -CredType 'DOMAIN_PASSWORD'" );
+
+				};
+
+				var err = [],
+					result = [];
+
+				child.stdout.on( "data", function(data) {
 				
-			//console.log( "Powershell Data: " + data);
+					//console.log( "Powershell Data: " + data);
 
-			result.push(data);
+					result.push(data);
 				
-		});
+				});
 				
-		child.stderr.on( "data", function(data) {
+				child.stderr.on( "data", function(data) {
 				
-			//console.log( "Powershell Errors: " + data );
+					//console.log( "Powershell Errors: " + data );
 
-			err.push(data);
+					err.push(data);
 				
-		});
+				});
 				
-		child.on( "exit", function(){
+				child.on( "exit", function(){
 
-			//console.log("Powershell Script finished");
+					//console.log("Powershell Script finished");
 
-			if( err.length > 0 ) {
+					if( err.length > 0 ) {
 
-				callback(err);
+						callback(err);
+
+					} else {
+
+						callback(false, result);
+
+					};
+				
+				});
+
+				child.stdin.end(); //end input
 
 			} else {
 
-				callback(false, result);
+				callback(error);
 
 			};
-				
-		});
 
-		child.stdin.end(); //end input
+		});
 
 	}
 
