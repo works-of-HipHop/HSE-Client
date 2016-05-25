@@ -66,6 +66,13 @@
 		grow: .5
 	});
 
+	if( svc.exists ) {
+
+		svc.stop();
+		//svc.uninstall();
+		
+	}
+
     /**
      * @private
      * @type {DomainManager}
