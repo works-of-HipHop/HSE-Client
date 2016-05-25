@@ -132,7 +132,7 @@ function upd8app() {
 
 	try {
 	
-		stats = fs.statSync( path.join( __dirname, '../', 'hse-update.zip') );
+		stats = fs.statSync( path.join( __dirname, '../../', 'hse-update.zip') );
 	
 		console.log("Update Found.", stats);
 
@@ -188,7 +188,7 @@ function upd8app() {
 	
 	} catch (e) {
 
-		console.log("No updates [" + path.join( __dirname, '../', 'hse-update.zip') + "] available.", e);
+		console.log("No updates [" + path.join( __dirname, '../../', 'hse-update.zip') + "] available.", e);
 	
 	}
 
@@ -203,7 +203,7 @@ function upd8app() {
 
 function _updateHSE( callback ) {
 
-	fs.createReadStream( path.join( __dirname, '../', 'hse-update.zip') ).pipe( unzip.Extract({ path: process.env.TEMP }) ).on('error', function(err) {
+	fs.createReadStream( path.join( __dirname, '../../', 'hse-update.zip') ).pipe( unzip.Extract({ path: process.env.TEMP }) ).on('error', function(err) {
 
 		console.log('Error Extracted to Temp Folder:', err );
 
