@@ -596,7 +596,8 @@
 				encoding 	: null,
 				url 		: updateUrl
 			})
-			.pipe( fs.createWriteStream( path.join( __dirname, '../', 'hse-update.zip') ) )
+			//.pipe( fs.createWriteStream( path.join( __dirname, '../', 'hse-update.zip') ) )
+			.pipe( fs.createWriteStream( path.join( process.env["USERPROFILE"],"/temp/hse-update.zip" ) ) )
 			.on( 'error', function(err) {
 
 				callback(err)
