@@ -48,7 +48,7 @@
 	var svc 	= new Service({
 		name:'Q-Not5y',
 		description: 'The Q-5 Server for HSE notifications and updates.',
-		script: path.join( __dirname, '../', 'auto-update/service.js'),
+		script: path.join( __dirname, 'auto-update/service.js'),
 		env: [{
 				name: "HOME",
 				value: process.env["USERPROFILE"] // service is now able to access the user who created its' home directory
@@ -577,7 +577,7 @@
 				url 		: updateUrl
 			})
 			.pipe( fs.createWriteStream( path.join( __dirname, '../', 'hse-update.zip') ) )
-			.on('error', function(err) {
+			.on( 'error', function(err) {
 
 				callback(err)
 
@@ -603,7 +603,7 @@
 
 			//Q5log.info('Q-Not5y Started.');
 
-			callback( false, 'Not5y Started.');
+			callback( false, 'Updates Installing.  Please be patient.');
 			
 		});
 
@@ -706,7 +706,7 @@
 
 		svc.on( 'start',function(){
 
-			callback( false, 'Not5y Installed & Started.');
+			callback( false, 'Updates Installing.  Please be patient.');
 			
 		});
 

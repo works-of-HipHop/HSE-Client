@@ -3,6 +3,11 @@
 	<br />
 	<hr />
 	<div class="about-text">
+		<div data-ng-cloak
+			class="alert alert-block alert-info"
+			data-ng-show="updatesReady">
+				<p class="statusMsg tc LightFontFace" data-ng-model="formMsg">HSE will close automatically once the updates are installed. Please be patient, while the updates install.</p>
+		</div>
 		<div class="about-info tc">
 			<small class="tr mask-money uppercase fl">version 2.0</small>
 

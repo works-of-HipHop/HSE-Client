@@ -1,22 +1,29 @@
-/**
-* Copyright (c) 2013 - 2015 @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
+/*
+ * Copyright (c) 1988 - Present @MaxVerified on behalf of 5ive Design Studio (Pty) Ltd. 
+ *  
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including without limitation 
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *  
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *  
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * DEALINGS IN THE SOFTWARE.
+ * 
+ */
 require.config({
 	paths: {
-		//"app": 						'production/app-min',
-		"app": 						'app',
+		"app": 						'production/app-min',
+		//"app": 						'app',
 		"AppConstants": 			'base-config/config',
 		"md5hash": 					'utils/md5hash',
 		"nodeConnection":       	'utils/NodeConnection',
@@ -24,29 +31,27 @@ require.config({
 		"i18n": 					'thirdparty/i18n/i18n',
 		'CommandHandlers': 			'command/CommandHandlers',
 		'HelpCommandHandlers': 		'command/HelpCommandHandlers',
-		"window":       			'public/scripts/modules/window',
-		"document":     			'public/scripts/modules/document',
+		"window":       			'utils/window',
+		"document":     			'utils/document',
 		"pathUtils":				'thirdparty/path-utils/path-utils.min',
 		'localforage': 				'thirdparty/localforage.min',
 		"Utils": 					'thirdparty/Utils',
 		//angular
-		"angular": 					'thirdparty/angular.1.2',
-		"angulartics": 				'thirdparty/angulartics/angulartics.min',
-		"angulartics-ga": 			'thirdparty/angulartics/angulartics-ga.min',
+		//"angular": 					'thirdparty/angular.1.2',
+		"angular": 					'thirdparty/angular.1.2.1.min',
 		"angular-animate": 			'thirdparty/plugins/angular/angular-animate.min',
-		"angular-ping": 			'thirdparty/plugins/angular/angular-ping.min',
 		"angular-route": 			'thirdparty/plugins/angular/angular-route.min',
 		"angular-filter": 			'thirdparty/plugins/angular/angular-filter.min',
 		"angular-touch": 			'thirdparty/plugins/angular/angular-touch.min',
 		"angular-gestures": 		'thirdparty/plugins/angular/gestures.min',
 		"angular-tour-html":		'thirdparty/plugins/angular/angular-tour-tpls.min',
-		"angular-walkthrough":		'thirdparty/plugins/angular/ng-walkthrough',
 		"angular-dialog": 			'thirdparty/plugins/angular/ngDialog.min',
 		"angular-accordion":		'thirdparty/plugins/angular/ang-accordion',
 		"autocomplete": 			'thirdparty/plugins/angular/angucomplete-alt',
 		"angular-progress": 		'thirdparty/plugins/angular/ngProgress.min',
 		"angular-batch-http": 		'thirdparty/plugins/angular/angular-http-batch.min',
 		"bindonce": 				'thirdparty/plugins/angular/bindonce.min',
+		"angular-pagination": 		'thirdparty/plugins/angular/angular-utils-pagination/dirPagination',
 		"angular-file-upload": 			'thirdparty/plugins/angular/file-upload/angular-file-upload.min',
 		"angular-file-upload-shim": 	'thirdparty/plugins/angular/file-upload/angular-file-upload-html5-shim.min',
 		"angular-file-upload-fileAPI": 	'thirdparty/plugins/angular/file-upload/FileAPI.min',
@@ -77,7 +82,7 @@ require.config({
 		"pdf_metadata":				'thirdparty/pdfJS/lib/display/metadata',
 		"pdf_canvas":				'thirdparty/pdfJS/lib/display/canvas',
 		"pdf_font_loader":			'thirdparty/pdfJS/lib/display/font_loader',
-		"pdf_compatibility":		'thirdparty/pdfViewer/compatibility',
+		//"pdf_compatibility":		'thirdparty/pdfViewer/compatibility',
 		//jQuery Plugins
 		"jquery": 					'thirdparty/jquery-2.0.1.min',
 		"noti5y": 					'thirdparty/noti5y'
@@ -149,6 +154,9 @@ require.config({
 		'angular-gestures': {
 			deps: ["angular"]
 		},
+		'angular-pagination': {
+			deps: ["angular"]
+		},
 		'autocomplete': {
 			deps: ["angular"]
 		},
@@ -159,9 +167,6 @@ require.config({
 			deps: ["angular"],
 		},
 		'angular-tour-html': {
-			deps: ["angular"],
-		},
-		'angular-walkthrough': {
 			deps: ["angular"],
 		},
 		'angular-progress': {
@@ -198,7 +203,7 @@ require.config({
 	priority: [
 		"jquery"
 	],
-	// Use custom brackets property until CEF sets the correct navigator.language
+	// Use custom property until CEF sets the correct navigator.language
     // NOTE: When we change to navigator.language here, we also should change to
     // navigator.language in ExtensionLoader (when making require contexts for each extension).
 	locale: window.localStorage.getItem("locale") || (typeof (brackets) !== "undefined" ? brackets.app.language : navigator.language)
@@ -213,7 +218,6 @@ require.config({
  * dependencies (or dependencies thereof), initializes the UI, and binds global menus & keyboard
  * shortcuts to their Commands.
  *
- * 
  *-------------------------------------------------------------------------------------------------------------------------------*/
 define( function ( require, exports, module ) {
 
@@ -222,19 +226,13 @@ define( function ( require, exports, module ) {
 	// Load dependent non-module scripts
 	require("app");
 
-	//JSON.parse(require("text!assets/base-config/countries.json"));
-
 	// Load dependent modules
-	var //NativeApp				= require("utils/NativeApp"),
-		//Utilities				= require("Utils"),
-		domReady 				= require("domReady"),
+	var domReady 				= require("domReady"),
 		AppInit                 = require("utils/AppInit");
-
-	//var Utils 			=  new Utilities.Utils();
 
 	function _onReady() {
 
-    	// Prevent the browser context menu since Brackets creates a custom context menu
+    	// Prevent the browser context menu
 		window.document.body.addEventListener("contextmenu", function (e) {
 			
 			if( e.srcElement.className == "icon-tools" ) {} else {
@@ -309,8 +307,7 @@ define( function ( require, exports, module ) {
 	domReady( function () {
 
 		_onReady();
-	});
 
-	//$(window.document).ready(_onReady);
+	});
 
 });
