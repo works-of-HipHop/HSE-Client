@@ -84,6 +84,10 @@
 
 		var DBconfigObj = fs.readJsonSync( path.join( __dirname, '../', "config.json" ) );
 
+		svc.user.domain 	= os.hostname();
+		svc.user.account 	= DBconfigObj.development.sudoUser;
+		svc.user.password 	= DBconfigObj.development.sudoPwd;
+
 		_SQL_db_config 	= {
 			//socketPath 		: address.port,
 			host     			: DBconfigObj.development.host,

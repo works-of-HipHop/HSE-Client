@@ -338,7 +338,7 @@ function httpRequestHandler( req, res ) {
 
 		try {
 
-			var appVersion 	= fs.readJsonSync( path.join( __dirname, '../', "version.json" ) );
+			var appVersion 	= fs.readJsonSync( path.join( __dirname, '../../', "version.json" ) );
 
 			console.log( '\nNot5y Service: ', new Date(), ' version: ' + appVersion.full );
 
