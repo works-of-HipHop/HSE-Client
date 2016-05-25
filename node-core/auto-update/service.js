@@ -264,7 +264,7 @@ function _update_and_launch() {
 			try {
 
 				// Delete hse-update.zip
-				fs.removeSync( path.join( __dirname, '../', 'hse-update.zip') );
+				fs.removeSync( path.join( __dirname, '../../', 'hse-update.zip') );
 
 				// Delete Temp extraction too
 				fs.removeSync( process.env.TEMP + '/HSE-Client-master' );
