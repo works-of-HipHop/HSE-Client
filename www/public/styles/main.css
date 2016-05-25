@@ -3204,7 +3204,7 @@ ul.pagination li {
 	background-repeat: repeat-x;
 	background-position: top center;
 }
-
+/** /
 #branding:after {
 	content: '';
 	position: absolute;
@@ -3218,7 +3218,7 @@ ul.pagination li {
 	background-repeat: no-repeat;
 	background-position: center bottom;
 	background-image: url('../images/headertop.png');
-}
+}/**/
 
 #pamela-dashboard .container {
 	min-width:800px;
