@@ -229,7 +229,7 @@ function _updateHSE( callback ) {
 
 					//fs.emptyDirSync( path.join( __dirname, '../', files[i] ) );
 				
-					fs.copySync( currentFile, path.join( __dirname, '../',  files[i] ), { clobber: true, preserveTimestamps: true } );
+					fs.copySync( currentFile, path.join( __dirname, '../../',  files[i] ), { clobber: true, preserveTimestamps: true } );
 					
 					console.log( currentFile + " successfully copied.");
 				
