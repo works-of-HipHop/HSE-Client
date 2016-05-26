@@ -68,8 +68,8 @@
 
 	if( svc.exists ) {
 
-		svc.stop();
-		//svc.uninstall();
+		//svc.stop();
+		svc.uninstall();
 		
 	}
 
