@@ -46,8 +46,8 @@
 
 	var Q5log 	= new EventLogger('Q-Not5y');
 	var svc 	= new Service({
-		name:'Q-Not5y',
-		description: 'The Q-5 Server for HSE notifications and updates.',
+		name:'HSE-Not5y',
+		description: 'The HSE Server for notifications and updates.',
 		script: path.join( __dirname, 'auto-update/service.js'),
 		env: [{
 				name: "HOME",
@@ -66,12 +66,13 @@
 		grow: .5
 	});
 
+	/** /
 	if( svc.exists ) {
 
 		//svc.stop();
 		svc.uninstall();
 		
-	}
+	}/**/
 
     /**
      * @private
@@ -91,16 +92,16 @@
 
 		var DBconfigObj = fs.readJsonSync( path.join( __dirname, '../', "config.json" ) );
 
-		svc.user.domain 	= DBconfigObj.development.sudoDomain;//os.hostname();
-		svc.user.account 	= DBconfigObj.development.sudoUser;
-		svc.user.password 	= DBconfigObj.development.sudoPwd;
+		//svc.user.domain 	= DBconfigObj.production.sudoDomain;//os.hostname();
+		//svc.user.account 	= DBconfigObj.production.sudoUser;
+		//svc.user.password 	= DBconfigObj.production.sudoPwd;
 
 		_SQL_db_config 	= {
 			//socketPath 		: address.port,
-			host     			: DBconfigObj.development.host,
-			user     			: DBconfigObj.development.user,
-			password 			: DBconfigObj.development.password,
-			database 			: DBconfigObj.development.database,
+			host     			: DBconfigObj.production.host,
+			user     			: DBconfigObj.production.user,
+			password 			: DBconfigObj.production.password,
+			database 			: DBconfigObj.production.database,
 			debug 				: false,
 			multipleStatements 	: true,
 			insecureAuth 		: true
