@@ -22,8 +22,8 @@
  */
 require.config({
 	paths: {
-		//"app": 						'production/app-min',
-		"app": 						'app',
+		"app": 						'production/app-min',
+		//"app": 						'app',
 		"AppConstants": 			'base-config/config',
 		"md5hash": 					'utils/md5hash',
 		"nodeConnection":       	'utils/NodeConnection',
